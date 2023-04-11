@@ -67,6 +67,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
     //getEstimated();
     getWallet();
   }
+
   List<WalletModel> walletList = [];
   double totalBal = 0;
   getWallet() async {
@@ -107,6 +108,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
   }
   List<CabType> cabs = [];
   TextEditingController promoCon = new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -246,115 +248,116 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                 ),
               ),
             ),*/
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                rideList.length > 0
-                    ? Container(
-                        height: 188,
-                        alignment: Alignment.center,
-                        child: ListView.builder(
-                          physics: BouncingScrollPhysics(),
-                          itemCount: rideList.length,
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) {
-                            vehicleType = rideList[index].catType == "Bike" ? "1" : "2";
-                            return Padding(
-                              padding: EdgeInsetsDirectional.only(end: 10),
-                              child: GestureDetector(
-                                onTap: () {
-                                  if(rideList[_currentCar].catType!=rideList[index].catType){
-                                    getDriver();
-                                  }
-                                  setState(() {
-                                    _currentCar = index;
-                                  });
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  rideList.length > 0
+                      ? Container(
+                          height: 188,
+                          alignment: Alignment.center,
+                          child: ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            itemCount: rideList.length,
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) {
+                              vehicleType = rideList[index].catType == "Bike" ? "1" : "2";
+                              return Padding(
+                                padding: EdgeInsetsDirectional.only(end: 10),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if(rideList[_currentCar].catType!=rideList[index].catType){
+                                      getDriver();
+                                    }
+                                    setState(() {
+                                      _currentCar = index;
+                                    });
 
-                                },
-                                child: Card(
-                                  elevation: 5,
-                                  child: AnimatedContainer(
-                                    duration: Duration(milliseconds: 350),
-                                    width:
-                                        MediaQuery.of(context).size.width / 3.5,
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: _currentCar == index
-                                          ? Theme.of(context).primaryColor
-                                          : Theme.of(context).backgroundColor,
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        FadedScaleAnimation(
-                                          Image.asset(
-                                            rideList[index].catType=="Bike"?"assets/cars/car1.png":"assets/cars/car2.png",
-                                            height: 80,
-                                            width: 80,
+                                  },
+                                  child: Card(
+                                    elevation: 5,
+                                    child: AnimatedContainer(
+                                      duration: Duration(milliseconds: 350),
+                                      width:
+                                          MediaQuery.of(context).size.width / 3.5,
+                                      padding: EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: _currentCar == index
+                                            ? Theme.of(context).primaryColor
+                                            : Theme.of(context).backgroundColor,
+                                        borderRadius: BorderRadius.circular(5),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          FadedScaleAnimation(
+                                            Image.asset(
+                                              rideList[index].catType=="Bike"?"assets/cars/car1.png":"assets/cars/car2.png",
+                                              height: 80,
+                                              width: 80,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          getTranslated(context,"GO")! +
-                                              ' ' +
-                                              rideList[index].cartype.toString(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyText2!
-                                              .copyWith(
-                                                  fontSize: 13.5,
-                                                  fontWeight: FontWeight.bold),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          'Est. ₹' +
-                                              rideList[index]
-                                                  .intailrate
-                                                  .toString(),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption!
-                                              .copyWith(
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Color(0xff605f5f)),
-                                        ),
-                                      ],
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                            getTranslated(context,"GO")! +
+                                                ' ' +
+                                                rideList[index].cartype.toString(),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodyText2!
+                                                .copyWith(
+                                                    fontSize: 13.5,
+                                                    fontWeight: FontWeight.bold),
+                                          ),
+                                          SizedBox(height: 4),
+                                          Text(
+                                            'Est. ₹ ${double.parse(rideList[index].intailrate.toString()) + surge} ' ,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .caption!
+                                                .copyWith(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xff605f5f)),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : SizedBox(),
-                SizedBox(height: 16),
-                /* CustomButton(
-                    text: getString(Strings.RIDE_NOW),
-                    color: Theme.of(context).primaryColor,
-                    textColor: Theme.of(context).scaffoldBackgroundColor,
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>FindingRidePage()));
-                    }
-                ),*/
-              ],
-            )
+                              );
+                            },
+                          ),
+                        )
+                      : SizedBox(),
+                  SizedBox(height: 16),
+                  /* CustomButton(
+                      text: getString(Strings.RIDE_NOW),
+                      color: Theme.of(context).primaryColor,
+                      textColor: Theme.of(context).scaffoldBackgroundColor,
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=>FindingRidePage()));
+                      }
+                  ),*/
+                ],
+              ),
+            ),
           ],
         ),
       ),
       floatingActionButton: InkWell(
         onTap: () {
-          scaffoldKey.currentState!.showBottomSheet((context) =>  Container(
+          scaffoldKey.currentState!.showBottomSheet((context) =>
+              Container(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -453,16 +456,24 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
           ),);
         },
         child: Container(
-          decoration: boxDecoration(
-              radius: 100,
-              showShadow: true,
-              bgColor: Theme.of(context).primaryColor),
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+              // radius: 100,
+              // showShadow: true,
+              color: Theme.of(context).primaryColor),
           height: 6.h,
-          width: 6.h,
-          child: Icon(
-            Icons.local_offer_outlined,
-            color: Colors.white,
-            size: 20.sp,
+          width: 27.h,
+          child: Row(
+            children: [
+              Text("Have a promo code?", style: TextStyle(color: Colors.white),),
+              const SizedBox(width: 5,),
+              Icon(
+                Icons.local_offer_outlined,
+                color: Colors.white,
+                size: 20.sp,
+              ),
+            ],
           ),
         ),
       ),
@@ -582,15 +593,15 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                 children: [
                   InkWell(
                     onTap: () {
-                      if(isFirstUser != "1") {
-                        if (bookingDate != null) {
-                          showConfirm("schedule");
-                        } else {
-                          showConfirm("now");
-                        }
-                      }else{
+                      getJoiningBonus();
+                      Future.delayed(Duration(seconds: 1), (){
+                          if (bookingDate != null) {
+                            showConfirm("schedule");
+                          } else {
+                            showConfirm("now");
+                          }
+                      });
 
-                      }
                       // Navigator.push(context, MaterialPageRoute(builder: (context)=>FindingRidePage()));
                     },
                     child: Container(
@@ -657,7 +668,6 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
   }
 
   showConfirm(String type) {
-    getJoiningBonus();
     surge = 0;
     gst = 0;
     gst = ((double.parse(rideList[_currentCar].gst)*double.parse(rideList[_currentCar].intailrate))/100).roundToDouble();
@@ -954,7 +964,6 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                       InkWell(
                         onTap: () {
                           Navigator.pop(context1);
-                          if(isFirstUser != "1") {
                             if (type == "now") {
                               if (totalBal.isNegative) {
                                 setState(() {
@@ -980,7 +989,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                                 addScheduleRides();
                               }
                             }
-                          }
+
 
                           // Navigator.push(context, MaterialPageRoute(builder: (context)=>FindingRidePage()));
                         },
@@ -1008,9 +1017,9 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
   }
 
 
-
   String paymentType = "Wallet";
   DateTime? bookingDate;
+
   Future getEstimated() async {
     calculateDistance(widget.source.latitude, widget.source.longitude,
         widget.destination.latitude, widget.destination.longitude);
@@ -1136,6 +1145,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
     }
   }
   String promoDiscount = "0";
+
   addScheduleRides() async {
     try {
       setState(() {
@@ -1219,6 +1229,11 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
         setState((){
           rideList =new List.from(tempList.reversed);
         });
+        if(rideList[_currentCar].surge_charge[0]['time_on_off'].toString()!="CLOSED"){
+          surge = ((double.parse(rideList[_currentCar].surge_charge[0]['amount'].toString())*double.parse(rideList[_currentCar].intailrate))/100).roundToDouble();
+        }else{
+          surge = 0;
+        }
 
       } else {
        // setSnackbar(response['message'], context);
@@ -1301,6 +1316,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
   List<PromoModel> promoList = [];
   String bonusAmount = '';
   String minRideAmount = '';
+
   getPromo() async {
     try {
       setState(() {
@@ -1353,18 +1369,18 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
       if (response['status']) {
         minRideAmount = response['data']['min_booking'];
           String promoAmount = response['data']['amount'];
-        print("this is joining bonus amount $minRideAmount");
+        print("this is joining bonus amount $minRideAmount and $promoAmount");
         setState(() {
           driveStatus = false;
         });
-        if(isFirstUser != null && isFirstUser != "1") {
-            if (double.parse(rideList[_currentCar].intailrate) >
-                double.parse(minRideAmount)) {
+        if(isFirstUser == "0") {
+            if (double.parse(rideList[_currentCar].intailrate) > double.parse(minRideAmount)) {
               setState(() {
                 promoDiscount = promoAmount;
               });
           }
         }
+        print("this is promoDiscount $promoDiscount");
       } else {
         setState(() {
           driveStatus = false;

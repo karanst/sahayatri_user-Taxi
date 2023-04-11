@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:cabira/BookRide/choose_cab_page.dart';
 import 'package:cabira/BookRide/finding_ride_page.dart';
@@ -62,7 +63,17 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
     TimeModel("2", "2 Hour", "₹350", "40Km", "₹175"),
     TimeModel("3", "3 Hour", "₹450", "60Km", "₹150"),
   ];
+  final colorizeColors = [
+    Colors.purple,
+    Colors.blue,
+    Colors.yellow,
+    Colors.red,
+  ];
 
+  final colorizeTextStyle = TextStyle(
+    fontSize: 14.0,
+    fontFamily: 'Horizon',
+  );
   vehicleCardBike(BikeData rentList, int index){
     return Container(
       height: 200,
@@ -560,6 +571,7 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
       Map params = {
         "user_id": curUserId.toString(),
       };
+      print("this is current user ID $params");
       Map response =
           await apiBase.postAPICall(Uri.parse(baseUrl + "get_profile"), params);
       setState(() {
@@ -583,7 +595,7 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
           refer = data['referral_code'];
         });
 
-        print("IMAGE========" + imagePath.toString());
+        print("this is request data --->>>>>>> $isFirstUser");
         final referCodeService = ReferCodeService(context);
         referCodeService.init(null);
       } else {
@@ -1504,6 +1516,28 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
                           fontSize: 10.sp,
                           textColor: Theme.of(context).colorScheme.primary))
                   : SizedBox(),
+             isFirstUser == "0" ? Center(
+                child: Container(
+                  padding: EdgeInsets.all(getWidth(10)),
+                  color: Colors.white,
+                  child: AnimatedTextKit(
+                    animatedTexts: [
+                      ColorizeAnimatedText(
+                        "Get special offer on your first ride",
+                        textStyle: colorizeTextStyle,
+                        colors: colorizeColors,
+                      ),
+                    ],
+                    pause: Duration(milliseconds: 100),
+                    isRepeatingAnimation: true,
+                    totalRepeatCount: 100,
+                    onTap: () {
+                      print("Tap Event");
+                    },
+                  ),
+                ),
+              )
+              : const SizedBox.shrink(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -1526,6 +1560,7 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
                           return;
                         }
                        else if (latitude != 0 && dropLatitude != 0) {
+
                           var result = await Navigator.push(
                               context,
                               MaterialPageRoute(

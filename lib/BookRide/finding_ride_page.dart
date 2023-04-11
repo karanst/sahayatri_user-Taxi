@@ -231,7 +231,9 @@ class _FindingRidePageState extends State<FindingRidePage>
       slideCurve: Curves.linearToEaseOut,
     );
   }
+
   ApiBaseHelper apiBaseHelper = new ApiBaseHelper();
+
   cancelRide(bookingId)async{
     Map data = {
       "booking_id" : bookingId,

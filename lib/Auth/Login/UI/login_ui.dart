@@ -177,12 +177,11 @@ class _LoginUIState extends State<LoginUI> {
                                    radius: 10,
                                    bgColor: Theme.of(context).primaryColor),
                                child: Center(
-                                   child: !loading
-                                       ?text("REGISTER",
+                                   child: text("REGISTER",
                                        // getTranslated(context, "CONTINUE")!,
                                        fontFamily: fontMedium,
                                        fontSize: 12.sp,
-                                       textColor: Colors.white):CircularProgressIndicator()),
+                                       textColor: Colors.white)),
                              ),
                            ),
                          ],
@@ -466,6 +465,7 @@ class _LoginUIState extends State<LoginUI> {
   ApiBaseHelper apiBase = new ApiBaseHelper();
   bool isNetwork = false;
   bool loading = false;
+  bool loading1 = false;
 
   loginUser() async {
     await App.init();
