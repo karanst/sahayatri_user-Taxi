@@ -1659,6 +1659,7 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
   String? bookngDat;
   String? bookingTime;
   MyRideModel? model1;
+
   getCurrentInfo() async {
     try {
       setState(() {

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:animation_wrappers/animation_wrappers.dart';
+import 'package:cabira/BookRide/choose_cab_page.dart';
 import 'package:cabira/BookRide/finding_ride_page.dart';
 import 'package:cabira/BookRide/map.dart';
 import 'package:cabira/BookRide/search_location_page.dart';
@@ -59,8 +60,8 @@ class _RideBookedPageState extends State<RideBookedPage> {
         print(response);
         print(response);
         bool status = true;
-        String msg = response['message'];
-        setSnackbar(msg, context);
+        // String msg = response['message'];
+        // setSnackbar(msg, context);
         if (response['status']) {
           for(var v in response['data']){
             setState(() {
@@ -236,16 +237,30 @@ class _RideBookedPageState extends State<RideBookedPage> {
     PushNotificationService pushNotificationService = new PushNotificationService(context: context, onResult: (result){
       //if(mounted&&result=="yes")
       print("result" + result);
-      if(result == "com"||result == "cancel"){
+      if(result == "cancel") {
+        Navigator.pushAndRemoveUntil(
+            context, MaterialPageRoute(builder: (context) =>
+            FindingRidePage(
+                LatLng(latitude, longitude),
+                LatLng(double.parse(widget.model.dropLatitude.toString()),
+                    double.parse(widget.model.dropLongitude.toString())),
+                widget.model.pickupAddress.toString(),
+                widget.model.dropAddress.toString(),
+                widget.model.paymentMedia.toString(),
+                widget.model.bookingId.toString(),
+                widget.model.amount.toString(),
+                widget.model.km.toString())), (route) => false);
+      }
 
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>FindingRidePage( LatLng(latitude, longitude),
-            LatLng(double.parse(widget.model.dropLatitude.toString()), double.parse(widget.model.dropLongitude.toString())),
-            widget.model.pickupAddress.toString(), widget.model.dropAddress.toString(),
-            widget.model.paymentMedia.toString(), widget.model.bookingId.toString(),  widget.model.amount.toString(),  widget.model.km.toString())), (route) => false);
+         if(result == "com") {
+        showDialog(context: context,
+            builder: (context) => RateRideDialog(widget.model));
+        // Navigator.pushAndRemoveUntil(
+        //     context, MaterialPageRoute(builder: (context) =>
+        //     SearchLocationPage()), (route) => false);
 
-        if(result == "com")
-        showDialog(context: context, builder: (context) => RateRideDialog(widget.model));
-      }else{
+      }
+      else{
         getCurrentInfo();
       }
     });
@@ -627,7 +642,8 @@ class _RideBookedPageState extends State<RideBookedPage> {
                   ),
                 ),
               ),
-              isOpened?Details(widget.model):SizedBox(),
+
+              isOpened? Details(widget.model): SizedBox(),
              /* AnimatedContainer(
                 duration: Duration(milliseconds: 300),
                 height: 72,
