@@ -86,6 +86,14 @@
               android:resource="@drawable/launch_background"
               />
             <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="developmentalphawizz.com"
+                    android:scheme="https"/>
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
@@ -101,10 +109,17 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="sahayatri-alternate.app.link" />
-                <data android:scheme="https" android:host="sahayatri.app.link" />
-                <data android:scheme="https" android:host="sahayatri-alternate.test-app.link" />
-                <data android:scheme="https" android:host="sahayatri.test-app.link" />
+                <data android:scheme="https" android:host="taxiuser-alternate.app.link" />
+                <data android:scheme="https" android:host="taxiuser.app.link" />
+                <data android:scheme="https" android:host="taxiuser-alternate.test-app.link" />
+                <data android:scheme="https" android:host="taxiuser.test-app.link" />
+            </intent-filter>
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="true" />
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="kpg" android:host="com.sahayatri.user" />
             </intent-filter>
         </activity>
         <activity android:name="com.facebook.FacebookActivity"
@@ -141,14 +156,14 @@
         <!-- Branch init -->
         <meta-data
             android:name="io.branch.sdk.BranchKey"
-            android:value="key_live_jg3HOEl0LFlV37VFh5gaMgphzymHIteo" />
+            android:value="key_live_nuiivxh9IOJLTt7LupPnfpepyFnr7HAA" />
         <!-- For your test app, if you have one; Again, use your actual test Branch key -->
         <meta-data
             android:name="io.branch.sdk.BranchKey.test"
-            android:value="key_test_anXLNBb2PqoM64Kta7sXMmhpDDhIQwps" />
-        <meta-data android:name="io.branch.sdk.TestMode" android:value="true" />
+            android:value="key_test_isbouAbYUHPJPC3GvoSfDemnEznxXJzN" />
+        <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
         <meta-data android:name="branch_enable_log"
-            android:value="true" />
+            android:value="false" />
         <meta-data android:name="branch_enable_facebook_ads"
             android:value="false" />
         <service

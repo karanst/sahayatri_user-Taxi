@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'package:cabira/DrawerPages/Wallet/wallet_page.dart';
 import 'package:cabira/Model/promo_code.dart';
 import 'package:cabira/Model/wallet_model.dart';
 import 'package:cabira/utils/colors.dart';
@@ -39,20 +38,12 @@ class CabType {
 
 class ChooseCabPage extends StatefulWidget {
   LatLng source, destination;
-  String pickAddress, dropAddress, pickCity, dropCity, paymentType, shareType;
+  String pickAddress, dropAddress, paymentType, shareType;
 
   DateTime? bookingDate;
 
-  ChooseCabPage(
-      this.source,
-      this.destination,
-      this.pickAddress,
-      this.pickCity,
-      this.dropCity,
-      this.dropAddress,
-      this.paymentType,
-      this.bookingDate,
-      this.shareType);
+  ChooseCabPage(this.source, this.destination, this.pickAddress,
+      this.dropAddress, this.paymentType, this.bookingDate, this.shareType);
 
   @override
   _ChooseCabPageState createState() => _ChooseCabPageState();
@@ -70,7 +61,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
     paymentType = widget.paymentType;
     bookingDate = widget.bookingDate;
     getDriver();
-
+    getPromo();
     // getJoiningBonus();
 //    getRides();
     getTime1(
@@ -122,7 +113,6 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
 
   List<CabType> cabs = [];
   TextEditingController promoCon = new TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -142,7 +132,6 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                     true,
                     pick: widget.pickAddress,
                     dest: widget.dropAddress,
-                    zoom: widget.shareType != "" ? 9 : 15,
                     driveList: driverList,
                     SOURCE_LOCATION: widget.source,
                     DEST_LOCATION: widget.destination,
@@ -264,276 +253,236 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                 ),
               ),
             ),*/
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  rideList.length > 0
-                      ? Container(
-                          height: 188,
-                          alignment: Alignment.center,
-                          child: ListView.builder(
-                            physics: BouncingScrollPhysics(),
-                            itemCount: rideList.length,
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context, index) {
-                              vehicleType =
-                                  rideList[index].catType == "Bike" ? "1" : "2";
-                              return Padding(
-                                padding: EdgeInsetsDirectional.only(end: 10),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    if (rideList[_currentCar].catType !=
-                                        rideList[index].catType) {
-                                      getDriver();
-                                    }
-                                    setState(() {
-                                      _currentCar = index;
-                                    });
-                                    getPromo();
-                                  },
-                                  child: Card(
-                                    elevation: 5,
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 350),
-                                      width: MediaQuery.of(context).size.width /
-                                          3.5,
-                                      padding: EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: _currentCar == index
-                                            ? Theme.of(context).primaryColor
-                                            : Theme.of(context).backgroundColor,
-                                        borderRadius: BorderRadius.circular(5),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Image.asset(
-                                            rideList[index].catType == "Bike"
-                                                ? "assets/cars/car1.png"
-                                                : "assets/cars/car2.png",
-                                            height: 80,
-                                            width: 80,
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          ),
-                                          Text(
-                                            getTranslated(context, "GO")! +
-                                                ' ' +
-                                                rideList[index]
-                                                    .cartype
-                                                    .toString(),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyText2!
-                                                .copyWith(
-                                                    fontSize: 13.5,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Text(
-                                            // + surge
-                                            'Est. ₹ ${double.parse(rideList[index].intailrate.toString()) - double.parse(promoDiscount)} ',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .caption!
-                                                .copyWith(
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Color(0xff605f5f)),
-                                          ),
-                                        ],
-                                      ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                rideList.length > 0
+                    ? Container(
+                        height: 188,
+                        alignment: Alignment.center,
+                        child: ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          itemCount: rideList.length,
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            vehicleType =
+                                rideList[index].catType == "Bike" ? "1" : "2";
+                            return Padding(
+                              padding: EdgeInsetsDirectional.only(end: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (rideList[_currentCar].catType !=
+                                      rideList[index].catType) {
+                                    getDriver();
+                                  }
+                                  setState(() {
+                                    _currentCar = index;
+                                  });
+                                },
+                                child: Card(
+                                  elevation: 5,
+                                  child: AnimatedContainer(
+                                    duration: Duration(milliseconds: 350),
+                                    width:
+                                        MediaQuery.of(context).size.width / 3.5,
+                                    padding: EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: _currentCar == index
+                                          ? Theme.of(context).primaryColor
+                                          : Theme.of(context).backgroundColor,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Image.asset(
+                                          rideList[index].catType == "Bike"
+                                              ? "assets/cars/car1.png"
+                                              : "assets/cars/car2.png",
+                                          height: 80,
+                                          width: 80,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          getTranslated(context, "GO")! +
+                                              ' ' +
+                                              rideList[index]
+                                                  .cartype
+                                                  .toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText2!
+                                              .copyWith(
+                                                  fontSize: 13.5,
+                                                  fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Est. ₹' +
+                                              rideList[index]
+                                                  .intailrate
+                                                  .toString(),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption!
+                                              .copyWith(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Color(0xff605f5f)),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                          ),
-                        )
-                      : SizedBox(),
-                  SizedBox(height: 16),
-                  /* CustomButton(
-                      text: getString(Strings.RIDE_NOW),
-                      color: Theme.of(context).primaryColor,
-                      textColor: Theme.of(context).scaffoldBackgroundColor,
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context)=>FindingRidePage()));
-                      }
-                  ),*/
-                ],
-              ),
-            ),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    : SizedBox(),
+                SizedBox(height: 16),
+                /* CustomButton(
+                    text: getString(Strings.RIDE_NOW),
+                    color: Theme.of(context).primaryColor,
+                    textColor: Theme.of(context).scaffoldBackgroundColor,
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>FindingRidePage()));
+                    }
+                ),*/
+              ],
+            )
           ],
         ),
       ),
-      floatingActionButton: promoList.length > 0 && isFirstUser != "0"
-          ? InkWell(
-              onTap: () {
-                scaffoldKey.currentState!.showBottomSheet(
-                  (context) => Container(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        boxHeight(10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: text(
-                                getTranslated(context, "OFFER")!,
-                                isCentered: true,
-                                fontSize: 14.sp,
-                                fontFamily: fontMedium,
-                                textColor: MyColorName.colorTextPrimary,
-                              ),
+      floatingActionButton: InkWell(
+        onTap: () {
+          scaffoldKey.currentState!.showBottomSheet(
+            (context) => Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  boxHeight(10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: text(
+                          getTranslated(context, "OFFER")!,
+                          isCentered: true,
+                          fontSize: 14.sp,
+                          fontFamily: fontMedium,
+                          textColor: MyColorName.colorTextPrimary,
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(
+                            Icons.close,
+                            color: MyColorName.colorTextPrimary,
+                          )),
+                    ],
+                  ),
+                  boxHeight(10),
+                  Container(
+                    margin: EdgeInsets.all(getWidth(10)),
+                    child: TextField(
+                      controller: promoCon,
+                      decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(),
+                          hintText: getTranslated(context, "PROMO_CODE1")!,
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              applyCode(promoCon.text);
+                            },
+                            icon: Icon(
+                              Icons.send,
+                              color: MyColorName.primaryLite,
                             ),
-                            IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                icon: Icon(
-                                  Icons.close,
-                                  color: MyColorName.colorTextPrimary,
-                                )),
-                          ],
-                        ),
-                        boxHeight(10),
-                        Container(
-                          margin: EdgeInsets.all(getWidth(10)),
-                          child: TextField(
-                            controller: promoCon,
-                            decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(),
-                                focusedBorder: OutlineInputBorder(),
-                                hintText:
-                                    getTranslated(context, "PROMO_CODE1")!,
-                                suffixIcon: IconButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    applyCode(promoCon.text);
-                                  },
-                                  icon: Icon(
-                                    Icons.send,
-                                    color: MyColorName.primaryLite,
-                                  ),
-                                )),
-                          ),
-                        ),
-                        boxHeight(10),
-                        ListView.builder(
-                            itemCount: promoList.length,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return Container(
-                                margin: EdgeInsets.all(getWidth(10)),
-                                decoration: boxDecoration(
-                                  showShadow: true,
-                                ),
-                                child: ListTile(
-                                  title: text(
-                                    "${getTranslated(context, "PROMO_CODE1")} : ${promoList[index].promocode}",
-                                    fontSize: 14.sp,
-                                    fontFamily: fontMedium,
-                                    textColor: MyColorName.colorTextPrimary,
-                                  ),
-                                  subtitle: text(
-                                    "${promoList[index].message}",
-                                    fontSize: 14.sp,
-                                    fontFamily: fontMedium,
-                                    textColor: MyColorName.colorTextPrimary,
-                                  ),
-                                  trailing: InkWell(
-                                    onTap: () {
-                                      if (promoCon.text !=
-                                          promoList[index]
-                                              .promocode
-                                              .toString()) {
-                                        setState(() {
-                                          promoCon.text = promoList[index]
-                                              .promocode
-                                              .toString();
-                                        });
-                                        Navigator.pop(context);
-                                        applyCode(promoList[index].promocode);
-                                      } else {
-                                        setSnackbar(
-                                            "Promo code already applied",
-                                            context);
-                                      }
-                                    },
-                                    child: Container(
-                                      width: 20.w,
-                                      height: 4.h,
-                                      decoration: boxDecoration(
-                                          radius: 5,
-                                          bgColor: promoCon.text ==
-                                                  promoList[index]
-                                                      .promocode
-                                                      .toString()
-                                              ? Colors.grey
-                                              : Theme.of(context).primaryColor),
-                                      child: Center(
-                                          child: text(
-                                              promoCon.text ==
-                                                      promoList[index]
-                                                          .promocode
-                                                          .toString()
-                                                  ? "Applied"
-                                                  : getTranslated(
-                                                      context, "APPLY")!,
-                                              fontFamily: fontMedium,
-                                              fontSize: 10.sp,
-                                              isCentered: true,
-                                              textColor: Colors.white)),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }),
-                        boxHeight(10),
-                      ],
+                          )),
                     ),
                   ),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    // radius: 100,
-                    // showShadow: true,
-                    color: Theme.of(context).primaryColor),
-                height: 6.h,
-                width: 27.h,
-                child: Row(
-                  children: [
-                    Text(
-                      "Have a promo code?",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    Icon(
-                      Icons.local_offer_outlined,
-                      color: Colors.white,
-                      size: 20.sp,
-                    ),
-                  ],
-                ),
+                  boxHeight(10),
+                  ListView.builder(
+                      itemCount: promoList.length,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        return Container(
+                          margin: EdgeInsets.all(getWidth(10)),
+                          decoration: boxDecoration(
+                            showShadow: true,
+                          ),
+                          child: ListTile(
+                            title: text(
+                              "${getTranslated(context, "PROMO_CODE1")} : ${promoList[index].promocode}",
+                              fontSize: 14.sp,
+                              fontFamily: fontMedium,
+                              textColor: MyColorName.colorTextPrimary,
+                            ),
+                            subtitle: text(
+                              "${promoList[index].message}",
+                              fontSize: 14.sp,
+                              fontFamily: fontMedium,
+                              textColor: MyColorName.colorTextPrimary,
+                            ),
+                            trailing: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  promoCon.text =
+                                      promoList[index].promocode.toString();
+                                });
+                                Navigator.pop(context);
+                                applyCode(promoList[index].promocode);
+                              },
+                              child: Container(
+                                width: 20.w,
+                                height: 4.h,
+                                decoration: boxDecoration(
+                                    radius: 5,
+                                    bgColor: Theme.of(context).primaryColor),
+                                child: Center(
+                                    child: text(
+                                        getTranslated(context, "APPLY")!,
+                                        fontFamily: fontMedium,
+                                        fontSize: 10.sp,
+                                        isCentered: true,
+                                        textColor: Colors.white)),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                  boxHeight(10),
+                ],
               ),
-            )
-          : SizedBox(),
+            ),
+          );
+        },
+        child: Container(
+          decoration: boxDecoration(
+              radius: 100,
+              showShadow: true,
+              bgColor: Theme.of(context).primaryColor),
+          height: 6.h,
+          width: 6.h,
+          child: Icon(
+            Icons.local_offer_outlined,
+            color: Colors.white,
+            size: 20.sp,
+          ),
+        ),
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       bottomNavigationBar: Container(
         color: Colors.white,
@@ -541,7 +490,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             boxHeight(20),
-            /*Container(
+            Container(
               color: theme.backgroundColor,
               padding: EdgeInsets.symmetric(horizontal: 20),
               height: 52,
@@ -614,7 +563,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                   ),
                 ],
               ),
-            ),*/
+            ),
             Container(
               color: theme.backgroundColor,
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -649,22 +598,24 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Future.delayed(Duration(seconds: 1), () {
+                      if (isFirstUser != "1") {
                         if (bookingDate != null) {
                           showConfirm("schedule");
                         } else {
                           showConfirm("now");
                         }
-                      });
-
+                      } else {
+                        /*if (bookingDate != null) {
+                          showConfirm("schedule");
+                        } else {
+                          showConfirm("now");
+                        }*/
+                      }
                       // Navigator.push(context, MaterialPageRoute(builder: (context)=>FindingRidePage()));
                     },
                     child: Container(
                       width: 75.w,
-                      height: bookingDate != null &&
-                              bookingDate!.minute > DateTime.now().minute
-                          ? 7.h
-                          : 6.h,
+                      height: bookingDate != null ? 7.h : 6.h,
                       decoration: boxDecoration(
                           radius: 10, bgColor: Theme.of(context).primaryColor),
                       child: Center(
@@ -682,40 +633,35 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                                 )),
                     ),
                   ),
-                  bookingDate != null
-                      ? Container(
-                          decoration: boxDecoration(
-                              radius: 10,
-                              color: Theme.of(context).primaryColor),
-                          height: 6.h,
-                          width: 6.h,
-                          child: Center(
-                            child: IconButton(
-                                onPressed: () {
-                                  DatePicker.showDateTimePicker(context,
-                                      showTitleActions: true,
-                                      onChanged: (date) {
-                                    print('change $date in time zone ' +
-                                        date.timeZoneOffset.inHours.toString());
-                                  }, onConfirm: (date) {
-                                    setState(() {
-                                      bookingDate = date;
-                                    });
-                                    print('confirm $date');
-                                  },
-                                      //currentTime: DateTime.now(),
-                                      minTime: DateTime.now(),
-                                      maxTime: DateTime.now()
-                                          .add(Duration(days: 2)));
-                                },
-                                icon: Icon(
-                                  Icons.calendar_today_outlined,
-                                  color: Theme.of(context).primaryColor,
-                                  size: 24.sp,
-                                )),
-                          ),
-                        )
-                      : SizedBox()
+                  Container(
+                    decoration: boxDecoration(
+                        radius: 10, color: Theme.of(context).primaryColor),
+                    height: 6.h,
+                    width: 6.h,
+                    child: Center(
+                      child: IconButton(
+                          onPressed: () {
+                            DatePicker.showDateTimePicker(context,
+                                showTitleActions: true, onChanged: (date) {
+                              print('change $date in time zone ' +
+                                  date.timeZoneOffset.inHours.toString());
+                            }, onConfirm: (date) {
+                              setState(() {
+                                bookingDate = date;
+                              });
+                              print('confirm $date');
+                            },
+                                //currentTime: DateTime.now(),
+                                minTime: DateTime.now(),
+                                maxTime: DateTime.now().add(Duration(days: 2)));
+                          },
+                          icon: Icon(
+                            Icons.calendar_today_outlined,
+                            color: Theme.of(context).primaryColor,
+                            size: 24.sp,
+                          )),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -725,17 +671,14 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
     );
   }
 
-  String surgePer = '0';
   showConfirm(String type) {
+    getJoiningBonus();
     surge = 0;
     gst = 0;
-    if (rideList[_currentCar].gst != null && rideList[_currentCar].gst != "") {
-      gst = ((double.parse(rideList[_currentCar].gst) *
-                  double.parse(rideList[_currentCar].intailrate)) /
-              100)
-          .roundToDouble();
-    }
-
+    gst = ((double.parse(rideList[_currentCar].gst) *
+                double.parse(rideList[_currentCar].intailrate)) /
+            100)
+        .roundToDouble();
     // if(isFirstUser != "1"){
 
     // }
@@ -747,17 +690,13 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
         surge = ((double.parse(rideList[_currentCar]
                         .surge_charge[0]['amount']
                         .toString()) *
-                    (double.parse(rideList[_currentCar].intailrate) + gst)) /
+                    double.parse(rideList[_currentCar].intailrate)) /
                 100)
             .roundToDouble();
-        surgePer = rideList[_currentCar].surge_charge[0]['amount'].toString();
       } else {
         surge = 0;
       }
     }
-    print(gst);
-    print(surge);
-
     if (paymentType == "Wallet" &&
         walletAmount <
             surge + gst + double.parse(rideList[_currentCar].intailrate)) {
@@ -843,7 +782,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                   boxHeight(10),
                   Divider(),
                   boxHeight(10),
-                  /*Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       text("${getTranslated(context, "PAYMENT_MODE")} : ",
@@ -855,7 +794,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                           fontFamily: fontMedium,
                           textColor: Colors.black),
                     ],
-                  ),*/
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -869,25 +808,23 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                           textColor: Colors.black),
                     ],
                   ),
-                  double.parse(rideList[_currentCar].base_fare) >= 1
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            text("${getTranslated(context, "BASE_FARE")} : ",
-                                fontSize: 10.sp,
-                                fontFamily: fontMedium,
-                                textColor: Colors.black),
-                            text(
-                                double.parse(distance) >= 1
-                                    ? "₹" + rideList[_currentCar].base_fare
-                                    : "₹" + rideList[_currentCar].minFare,
-                                fontSize: 10.sp,
-                                fontFamily: fontMedium,
-                                textColor: Colors.black),
-                          ],
-                        )
-                      : SizedBox(),
-                  double.parse(rideList[_currentCar].rate_per_km) >= 1
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      text("${getTranslated(context, "BASE_FARE")} : ",
+                          fontSize: 10.sp,
+                          fontFamily: fontMedium,
+                          textColor: Colors.black),
+                      text(
+                          double.parse(distance) >= 1
+                              ? "₹" + rideList[_currentCar].base_fare
+                              : "₹" + rideList[_currentCar].minFare,
+                          fontSize: 10.sp,
+                          fontFamily: fontMedium,
+                          textColor: Colors.black),
+                    ],
+                  ),
+                  double.parse(distance) >= 1
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -949,28 +886,6 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                           ],
                         )
                       : SizedBox(),
-                  double.parse(rideList[_currentCar].intailrate) > 0
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            text("${getTranslated(context, "SUB_TOTAL")} : ",
-                                fontSize: 10.sp,
-                                fontFamily: fontMedium,
-                                textColor: Colors.black),
-                            text(
-                                "₹" +
-                                    (surge +
-                                            gst +
-                                            double.parse(rideList[_currentCar]
-                                                    .intailrate)
-                                                .roundToDouble())
-                                        .toString(),
-                                fontSize: 10.sp,
-                                fontFamily: fontMedium,
-                                textColor: Colors.black),
-                          ],
-                        )
-                      : SizedBox(),
                   promoDiscount != "0"
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -979,11 +894,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                                 fontSize: 10.sp,
                                 fontFamily: fontMedium,
                                 textColor: Colors.black),
-                            text(
-                                "-₹" +
-                                    double.parse(promoDiscount)
-                                        .roundToDouble()
-                                        .toString(),
+                            text("-₹" + promoDiscount,
                                 fontSize: 10.sp,
                                 fontFamily: fontMedium,
                                 textColor: Colors.black),
@@ -1089,40 +1000,28 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                       InkWell(
                         onTap: () {
                           Navigator.pop(context1);
-                          if (type == "now") {
-                            if (totalBal.isNegative) {
-                              setState(() {
-                                saveStatus = true;
-                              });
-                              setSnackbar(
-                                  "You have negative balance, Please update wallet",
-                                  context);
-                              Navigator.pop(context);
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => WalletPage()));
+                          if (isFirstUser == "1") {
+                            if (type == "now") {
+                              if (totalBal.isNegative) {
+                                setState(() {
+                                  saveStatus = true;
+                                });
+                                setSnackbar(
+                                    "You have negative balance, Please update wallet",
+                                    context);
+                              } else {
+                                addRides();
+                              }
                             } else {
-                              addRides();
-                            }
-                          } else {
-                            print(
-                                "this is schedule time ${bookingDate!.hour} : ${bookingDate!.minute}");
-                            if (totalBal.isNegative) {
-                              setState(() {
-                                saveStatus = true;
-                              });
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => WalletPage()));
-                              setSnackbar(
-                                  "You have negative balance, Please update wallet",
-                                  context);
-                            } else {
-                              if (widget.shareType != "") {
-                                addInterCityRides();
+                              print(
+                                  "this is schedule time ${bookingDate!.hour} : ${bookingDate!.minute}");
+                              if (totalBal.isNegative) {
+                                setState(() {
+                                  saveStatus = true;
+                                });
+                                setSnackbar(
+                                    "You have negative balance, Please update wallet",
+                                    context);
                               } else {
                                 addScheduleRides();
                               }
@@ -1154,9 +1053,8 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
         });
   }
 
-  String paymentType = "Cash";
+  String paymentType = "Wallet";
   DateTime? bookingDate;
-
   Future getEstimated() async {
     calculateDistance(widget.source.latitude, widget.source.longitude,
         widget.destination.latitude, widget.destination.longitude);
@@ -1223,25 +1121,23 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
         "drop_address": widget.dropAddress,
         "drop_latitude": widget.destination.latitude.toString(),
         "drop_longitude": widget.destination.longitude.toString(),
-        "amount":
-            (double.parse(rideList[_currentCar].intailrate).roundToDouble() -
-                    double.parse(promoDiscount).roundToDouble() +
+        "amount": (double.parse(rideList[_currentCar].intailrate) -
+                double.parse(promoDiscount) +
+                gst +
+                surge)
+            .toStringAsFixed(2),
+        "paid_amount": double.parse(distance) >= 1
+            ? (double.parse(rideList[_currentCar].intailrate) -
+                    double.parse(promoDiscount) +
                     gst +
                     surge)
-                .toStringAsFixed(2),
-        //double.parse(distance) >= 1 ? rideList[_currentCar].minFare
-        "paid_amount":
-            (double.parse(rideList[_currentCar].intailrate).roundToDouble() -
-                    double.parse(promoDiscount).roundToDouble() +
-                    gst +
-                    surge)
-                .toStringAsFixed(2),
+                .toStringAsFixed(2)
+            : rideList[_currentCar].minFare,
         "gst_amount": gst.toStringAsFixed(2),
         "surge_amount": surge.toStringAsFixed(2),
         "distance": distance,
         "km": distance,
         "rate_per_km": rideList[_currentCar].rate_per_km,
-        "admin_commission": rideList[_currentCar].admin_commission,
         "total_time": totalTime,
         "base_fare": double.parse(distance) >= 1
             ? rideList[_currentCar].base_fare
@@ -1255,19 +1151,17 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                 rideList[_currentCar].cartype != "Bike"
             ? "2"
             : "1",
-        "paymenttype": "Wait For Payment", //paymentType,
+        "paymenttype": paymentType,
         "taxi_id": rideList[_currentCar].taxi_id,
         //"car_categories":rideList[_currentCar].i
-        "transaction": "Wait For Payment", //paymentType,
-        "surge_percentage": surgePer,
+        "transaction": paymentType,
       };
       if (promoDiscount != "0") {
-        params['promo_discount'] =
-            double.parse(promoDiscount).roundToDouble().toString();
+        params['promo_discount'] = promoDiscount.toString();
         params['promo_code'] = promoCon.text.toString();
       }
       print("ADD RIDE PARAM =====>  $params");
-      //return;
+      //  return;
       Map response = await apiBase.postAPICall(
           Uri.parse(baseUrl1 + "payment/booking_trip"), params);
       setState(() {
@@ -1286,10 +1180,8 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
                     response['booking_id'].toString(),
                     (surge +
                             gst +
-                            double.parse(rideList[_currentCar].intailrate)
-                                .roundToDouble() -
+                            double.parse(rideList[_currentCar].intailrate) -
                             double.parse(promoDiscount))
-                        .roundToDouble()
                         .toStringAsFixed(2),
                     // (double.parse(rideList[_currentCar].rate_per_km)+double.parse(rideList[_currentCar].base_fare)-double.parse(promoDiscount)+gst+surge).toStringAsFixed(2),
                     distance)));
@@ -1306,7 +1198,6 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
   }
 
   String promoDiscount = "0";
-
   addScheduleRides() async {
     try {
       setState(() {
@@ -1321,25 +1212,22 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
         "drop_address": widget.dropAddress,
         "drop_latitude": widget.destination.latitude.toString(),
         "drop_longitude": widget.destination.longitude.toString(),
-        "amount":
-            (double.parse(rideList[_currentCar].intailrate).roundToDouble() -
-                    double.parse(promoDiscount).roundToDouble() +
-                    gst +
-                    surge)
-                .toStringAsFixed(2),
-        "paid_amount":
-            (double.parse(rideList[_currentCar].intailrate).roundToDouble() -
-                    double.parse(promoDiscount).roundToDouble() +
-                    gst +
-                    surge)
-                .toStringAsFixed(2),
+        "amount": (double.parse(rideList[_currentCar].intailrate) +
+                double.parse(promoDiscount) +
+                gst +
+                surge)
+            .toStringAsFixed(2),
+        "paid_amount": (double.parse(rideList[_currentCar].intailrate) +
+                double.parse(promoDiscount) +
+                gst +
+                surge)
+            .toStringAsFixed(2),
         "gst_amount": gst.toStringAsFixed(2),
         "total_time": totalTime,
         "taxi_id": rideList[_currentCar].taxi_id,
         "surge_amount": surge.toStringAsFixed(2),
         "distance": distance,
         "km": distance,
-        "admin_commission": rideList[_currentCar].admin_commission,
         "taxi_type": rideList[_currentCar].cartype != ""
             ? rideList[_currentCar].cartype
             : "Bike",
@@ -1352,19 +1240,17 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
             ? rideList[_currentCar].base_fare
             : rideList[_currentCar].minFare,
         "time_amount": rideList[_currentCar].time_cahrge,
-        "paymenttype": "Wait For Payment", //paymentType,
-        "transaction": "Wait For Payment", //paymentType,
+        "paymenttype": paymentType,
+        "transaction": paymentType,
         "cancel_charge": rideList[_currentCar].cancellation_charges,
         "pickup_time": bookingDate!.minute == 0
             ? '${bookingDate!.hour}:${bookingDate!.minute}0'
             : '${bookingDate!.hour}:${bookingDate!.minute}',
         "pickup_date": DateFormat("yyyy-MM-dd").format(bookingDate!),
         "sharing_type": widget.shareType,
-        "surge_percentage": surgePer,
       };
       if (promoDiscount != "0") {
-        params['promo_discount'] =
-            double.parse(promoDiscount).roundToDouble().toString();
+        params['promo_discount'] = promoDiscount.toString();
         params['promo_code'] = promoCon.text.toString();
       }
       print(params);
@@ -1391,97 +1277,12 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
     }
   }
 
-  addInterCityRides() async {
-    try {
-      setState(() {
-        saveStatus = false;
-      });
-
-      Map params = {
-        "user_id": curUserId,
-        "username": name,
-        "pickup_address": widget.pickAddress,
-        "pickup_city": widget.pickCity.replaceAll(" ", ""),
-        "drop_city": widget.dropCity.replaceAll(" ", ""),
-        "latitude": widget.source.latitude.toString(),
-        "longitude": widget.source.longitude.toString(),
-        "drop_address": widget.dropAddress,
-        "drop_latitude": widget.destination.latitude.toString(),
-        "drop_longitude": widget.destination.longitude.toString(),
-        "amount":
-            (double.parse(rideList[_currentCar].intailrate).roundToDouble() -
-                    double.parse(promoDiscount).roundToDouble() +
-                    gst +
-                    surge)
-                .toStringAsFixed(2),
-        "paid_amount":
-            (double.parse(rideList[_currentCar].intailrate).roundToDouble() -
-                    double.parse(promoDiscount).roundToDouble() +
-                    gst +
-                    surge)
-                .toStringAsFixed(2),
-        "gst_amount": gst.toStringAsFixed(2),
-        "tax_percentage": rideList[_currentCar].gst.toString(),
-        "total_time": totalTime,
-        "taxi_id": rideList[_currentCar].taxi_id,
-        "admin_commission": rideList[_currentCar].admin_commission,
-        "surge_amount": surge.toStringAsFixed(2),
-        "distance": distance,
-        "km": distance,
-        "taxi_type": rideList[_currentCar].cartype != ""
-            ? rideList[_currentCar].cartype
-            : "Bike",
-        "delivery_type": rideList[_currentCar].cartype != "" &&
-                rideList[_currentCar].cartype != "Bike"
-            ? "2"
-            : "1",
-        "rate_per_km": rideList[_currentCar].rate_per_km,
-        "base_fare": double.parse(distance) >= 1
-            ? rideList[_currentCar].base_fare
-            : rideList[_currentCar].minFare,
-        "time_amount": rideList[_currentCar].time_cahrge,
-        "paymenttype": paymentType,
-        "transaction": paymentType,
-        "cancel_charge": rideList[_currentCar].cancellation_charges,
-        "pickup_time": bookingDate!.minute == 0
-            ? '${bookingDate!.hour}:${bookingDate!.minute}0'
-            : '${bookingDate!.hour}:${bookingDate!.minute}',
-        "pickup_date": DateFormat("yyyy-MM-dd").format(bookingDate!),
-        "sharing_type": widget.shareType == "Share" ? "1" : "0",
-      };
-      if (promoDiscount != "0") {
-        params['promo_discount'] =
-            double.parse(promoDiscount).roundToDouble().toString();
-        params['promo_code'] = promoCon.text.toString();
-      }
-      print(params);
-      Map response = await apiBase.postAPICall(
-          Uri.parse(baseUrl1 + "Payment/intercity_booking"), params);
-      setState(() {
-        saveStatus = true;
-      });
-      if (response['status']) {
-        Navigator.pop(context, "yes1");
-        setSnackbar("Booking Confirmed", context);
-      } else {
-        setSnackbar(response['message'], context);
-      }
-    } on TimeoutException catch (_) {
-      setSnackbar(getTranslated(context, "WRONG")!, context);
-      setState(() {
-        saveStatus = true;
-      });
-    }
-  }
-
   getRides(totalTime) async {
     try {
       Map params = {
-        "distance": double.parse(distance) >= 1 ? distance : "0",
+        "distance": distance,
         "lat": widget.source.latitude.toString(),
         "lang": widget.source.longitude.toString(),
-        "drop_city": widget.dropCity.replaceAll(" ", ""),
-        "pic_city": widget.pickCity.replaceAll(" ", ""),
         "time": totalTime,
         "location": "Indore",
         "type": widget.shareType != ""
@@ -1492,75 +1293,42 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
       };
       print("GET CAN CHARGE ;;;;;;;;;;;; $params");
       Map response = await apiBase.postAPICall(
-          Uri.parse(widget.shareType != ""
-              ? baseUrl1 + "Products/get_cab_intercity"
-              : baseUrl1 + "products/get_cab_charge"),
-          params);
+          Uri.parse(baseUrl1 + "products/get_cab_charge"), params);
       List<RideModel> tempList = [];
-      if (response['status'] &&
-          response['data'] != null &&
-          response['data'].length > 0) {
+      if (response['status']) {
         for (var v in response['data']) {
           setState(() {
             tempList.add(new RideModel(
                 v['taxi_id'],
                 v['cartype'],
                 v['intialkm'].toString(),
-                double.parse(v['amount'] != null
-                        ? v['amount'].toString()
-                        : v['fixed_amount'] != null
-                            ? v['fixed_amount'].toString()
-                            : "0")
-                    .roundToDouble()
-                    .toString(),
+                double.parse(v['amount'].toString()).roundToDouble().toString(),
                 double.parse(v['base_fare'] != null
                         ? v['base_fare'].toString()
                         : "0")
                     .roundToDouble()
                     .toString(),
-                double.parse(v['time_cahrge'] != null
-                        ? v['time_cahrge'].toString()
-                        : "0")
+                double.parse(v['time_cahrge'].toString())
                     .roundToDouble()
                     .toStringAsFixed(2),
                 double.parse(v['rate_per_km'].toString())
                     .roundToDouble()
                     .toStringAsFixed(2),
-                v['image'].toString(),
+                v['image'],
                 v['serge'].toString(),
                 v['gst'].toString(),
                 v['surge_charge'],
-                v['car_categories'].toString(),
-                v['min_fare'] != null
-                    ? double.parse(v['min_fare']).roundToDouble().toString()
-                    : "0",
-                double.parse(v['cancellation_charges'])
-                    .roundToDouble()
-                    .toString(),
-                v['admin_commission'].toString()));
+                v['car_categories'],
+                v['min_fare'] != null ? v['min_fare'].toString() : "0",
+                v['cancellation_charges'],
+                ""));
           });
         }
         setState(() {
           rideList = new List.from(tempList.reversed);
         });
-        getPromo();
-        getJoiningBonus();
-        if (rideList[_currentCar].surge_charge != null &&
-            rideList[_currentCar].surge_charge.length > 0 &&
-            rideList[_currentCar].surge_charge[0]['time_on_off'].toString() !=
-                "CLOSED") {
-          surge = ((double.parse(rideList[_currentCar]
-                          .surge_charge[0]['amount']
-                          .toString()) *
-                      double.parse(rideList[_currentCar].intailrate)) /
-                  100)
-              .roundToDouble();
-        } else {
-          surge = 0;
-        }
       } else {
-        setSnackbar("Rides Not Available", context);
-        Navigator.pop(context);
+        // setSnackbar(response['message'], context);
       }
     } on TimeoutException catch (_) {
       setSnackbar(getTranslated(context, "WRONG")!, context);
@@ -1649,32 +1417,24 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
   List<PromoModel> promoList = [];
   String bonusAmount = '';
   String minRideAmount = '';
-
   getPromo() async {
     try {
       setState(() {
         driveStatus = true;
-        promoList.clear();
+        driverList.clear();
       });
-      print(rideList[_currentCar].catType);
       Map params = {
         "lat": widget.source.latitude.toString(),
         "lang": widget.source.longitude.toString(),
-        "user_id": curUserId,
-        "vehicle_type": rideList[_currentCar].catType != "" &&
-                rideList[_currentCar].catType != "Bike"
-            ? "2"
-            : "1",
       };
-      // https: //productsalphawizz.com/taxi/api/Payment/get_promo_code
-      Map response = await apiBase.postAPICall(
-          Uri.parse(baseUrl1 + "Payment/get_promo_code"), params);
+      https: //productsalphawizz.com/taxi/api/Payment/get_promo_code
+      Map response = await apiBase.getAPICall(
+        Uri.parse(baseUrl1 + "Payment/get_promo_code"),
+      );
 
       if (response['status']) {
         for (var v in response['data']) {
-          setState(() {
-            promoList.add(new PromoModel.fromJson(v));
-          });
+          promoList.add(new PromoModel.fromJson(v));
         }
         setState(() {
           driveStatus = false;
@@ -1711,11 +1471,11 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
       if (response['status']) {
         minRideAmount = response['data']['min_booking'];
         String promoAmount = response['data']['amount'];
-        print("this is joining bonus amount $minRideAmount and $promoAmount");
+        print("this is joining bonus amount $minRideAmount");
         setState(() {
           driveStatus = false;
         });
-        if (isFirstUser == "0") {
+        if (isFirstUser != null && isFirstUser != "1") {
           if (double.parse(rideList[_currentCar].intailrate) >
               double.parse(minRideAmount)) {
             setState(() {
@@ -1723,7 +1483,6 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
             });
           }
         }
-        print("this is promoDiscount $promoDiscount");
       } else {
         setState(() {
           driveStatus = false;
@@ -1744,38 +1503,9 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
         saveStatus = false;
         driverList.clear();
       });
-      double gst = 0;
-      if (rideList[_currentCar].gst != null &&
-          rideList[_currentCar].gst != "") {
-        gst = ((double.parse(rideList[_currentCar].gst) *
-                    double.parse(rideList[_currentCar].intailrate)) /
-                100)
-            .roundToDouble();
-      }
-      print(gst);
-      double surge = 0;
-      if (widget.bookingDate == null &&
-          !rideList[_currentCar].serge.contains("Not") &&
-          rideList[_currentCar].surge_charge.length > 0) {
-        if (rideList[_currentCar].surge_charge[0]['time_on_off'].toString() !=
-            "CLOSED") {
-          surge = ((double.parse(rideList[_currentCar]
-                          .surge_charge[0]['amount']
-                          .toString()) *
-                      double.parse(rideList[_currentCar].intailrate)) /
-                  100)
-              .roundToDouble();
-        } else {
-          surge = 0;
-        }
-      }
-      print(widget.bookingDate);
-      print(surge);
-      print(rideList[_currentCar].intailrate);
-      gst += surge +
-          double.parse(rideList[_currentCar].intailrate).roundToDouble();
+
       Map params = {
-        "final_total": gst.toString(),
+        "final_total": rideList[_currentCar].intailrate,
         "promo_code": code,
         "user_id": curUserId,
       };
@@ -1786,35 +1516,27 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
 
       if (response['status']) {
         setSnackbar("${response['message']}", context);
-        setState(() {
-          saveStatus = true;
-        });
-        if (response['data'] is List &&
-            response['data'].length > 0 &&
-            response['data'][0]['type'] == 'Percentage') {
+        if (response['data'][0]['type'] == 'Percentage') {
           setState(() {
+            saveStatus = true;
             promoDiscount = response['data'][0]['final_discount'] != null &&
                     response['data'][0]['final_discount'] != ""
                 ? (double.parse(
-                        response['data'][0]['final_discount'].toString()))
-                    .roundToDouble()
-                    .toString()
+                            response['data'][0]['final_discount'].toString()) *
+                        double.parse(
+                            rideList[_currentCar].intailrate.toString()) /
+                        100)
+                    .toStringAsFixed(2)
                 : "0";
-            /*rideList[_currentCar].intailrate =
-                (double.parse(rideList[_currentCar].intailrate) -
-                        double.parse(promoDiscount))
-                    .toStringAsFixed(0);*/
           });
         } else {
-          if (response['data'] is List && response['data'].length > 0)
-            setState(() {
-              promoDiscount = response['data'][0]['final_discount'] != null &&
-                      response['data'][0]['final_discount'] != ""
-                  ? response['data'][0]['final_discount'].toString()
-                  : "0";
-              // rideList[_currentCar].intailrate = (double.parse(rideList[_currentCar].intailrate) -
-              //             double.parse(promoDiscount)).toStringAsFixed(0);
-            });
+          setState(() {
+            promoDiscount = response['data'][0]['final_discount'] != null &&
+                    response['data'][0]['final_discount'] != ""
+                ? response['data'][0]['final_discount'].toString()
+                : "0";
+            saveStatus = true;
+          });
         }
         print("this is promo discount ===>${promoDiscount.toString()}");
       } else {
@@ -1831,7 +1553,7 @@ class _ChooseCabPageState extends State<ChooseCabPage> {
       });
     }
   }
-  /* Future<RideModel?> getRide(distance) async {
+/* Future<RideModel?> getRide(distance) async {
     var request = http.MultipartRequest(
         'POST',
         Uri.parse(

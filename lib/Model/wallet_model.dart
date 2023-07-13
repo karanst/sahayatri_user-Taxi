@@ -3,20 +3,23 @@ class WalletModel {
   String? userId;
   String? transactionId;
   String? amount;
+  String? sign;
   String? createdAt;
   String? modifiedAt;
 
   WalletModel(
       {this.id,
-        this.userId,
-        this.transactionId,
-        this.amount,
-        this.createdAt,
-        this.modifiedAt});
+      this.userId,
+      this.sign,
+      this.transactionId,
+      this.amount,
+      this.createdAt,
+      this.modifiedAt});
 
   WalletModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['user_id'];
+    sign = json['sign'] ?? "";
     transactionId = json['transaction_id'];
     amount = json['amount'];
     createdAt = json['created_at'];

@@ -1,22 +1,27 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:animation_wrappers/animation_wrappers.dart';
+
+import 'package:cabira/BookRide/payment_dailog.dart';
 import 'package:cabira/BookRide/rate_ride_dialog.dart';
 import 'package:cabira/BookRide/search_location_page.dart';
 import 'package:cabira/Components/entry_field.dart';
 import 'package:cabira/DrawerPages/Rides/ride_info_page.dart';
+import 'package:cabira/Model/latlng_model.dart';
 import 'package:cabira/Model/my_ride_model.dart';
 import 'package:cabira/Model/reason_model.dart';
 import 'package:cabira/Model/rides_model.dart';
 import 'package:cabira/Theme/style.dart';
 import 'package:cabira/utils/ApiBaseHelper.dart';
+import 'package:cabira/utils/PushNotificationService.dart';
 import 'package:cabira/utils/Session.dart';
 import 'package:cabira/utils/colors.dart';
 import 'package:cabira/utils/common.dart';
 import 'package:cabira/utils/referCodeService.dart';
 import 'package:cabira/utils/widget.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:cabira/Assets/assets.dart';
 import 'package:cabira/Locale/locale.dart';
@@ -32,8 +37,8 @@ import 'dart:ui' as ui;
 import '../../utils/constant.dart';
 
 class RentalRides extends StatefulWidget {
-  final bool? selected;
-  const RentalRides({Key? key, this.selected}) : super(key: key);
+  final bool selected;
+  const RentalRides({Key? key, this.selected = true}) : super(key: key);
   @override
   State<RentalRides> createState() => _RentalRidesState();
 }
@@ -63,6 +68,7 @@ class _RentalRidesState extends State<RentalRides> {
         "user_id": curUserId,
         "type": type,
       };
+
       print("ALL COMPLETE RIDE PARAM ====== $params");
       Map response = await apiBase.postAPICall(
           Uri.parse(baseUrl1 + "Payment/rental_Bookint_by_user_id"), params);
@@ -86,8 +92,10 @@ class _RentalRidesState extends State<RentalRides> {
             if (timer != null) {
               timer!.cancel();
             }
-            timer = Timer.periodic(Duration(seconds: 3), (timer) {
-              getDriver(rideList[indexSelected!].driverId);
+            timer = Timer.periodic(Duration(seconds: 10), (timer) {
+              if (rideList.length > 0) {
+                getDriver(rideList[indexSelected!].driverId);
+              }
             });
           }
         }
@@ -108,8 +116,32 @@ class _RentalRidesState extends State<RentalRides> {
         selected = widget.selected!;
       });
     }
+    if (widget.selected) {
+      getRides("3");
+    } else {
+      getRides("1");
+    }
+    PushNotificationService notificationService = new PushNotificationService(
+        context: context,
+        onResult: (result) {
+          if (selected) {
+            getRides("3");
+          } else {
+            getRides("1");
+          }
+        });
+    notificationService.initialise();
     getReason();
     getRides("3");
+  }
+
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
   }
 
   getDriver(String? driverId) async {
@@ -123,6 +155,29 @@ class _RentalRidesState extends State<RentalRides> {
         };
         Map response = await apiBase.postAPICall(
             Uri.parse(baseUrl1 + "Payment/get_driver_details"), data);
+        if (indexSelected != null &&
+            indexSelected != -1 &&
+            rideList.length > 0) {
+          Map data1 = {
+            "booking_id": rideList[indexSelected!].bookingId.toString(),
+          };
+          Map response1 = await apiBase.postAPICall(
+              Uri.parse(baseUrl1 + "Payment/driver_latitude_logitude"), data1);
+          print(response1);
+          List<LatLngModel> tempList = [];
+          if (response1['status']) {
+            for (var v in response1['booking_id']) {
+              tempList.add(LatLngModel.fromJson(v));
+            }
+            double totalDistance = 0;
+            for (var i = 0; i < tempList.length - 1; i++) {
+              totalDistance += calculateDistance(tempList[i].lat,
+                  tempList[i].lang, tempList[i + 1].lat, tempList[i + 1].lang);
+            }
+            km = totalDistance.toStringAsFixed(2);
+            print("total" + totalDistance.toString());
+          }
+        }
         print(response);
         print(response);
         bool status = true;
@@ -135,7 +190,9 @@ class _RentalRidesState extends State<RentalRides> {
               driveLat = double.parse(data['latitude']);
               driveLng = double.parse(data['longitude']);
               print(indexSelected);
-              if (indexSelected != null && indexSelected != -1) {
+              if (indexSelected != null &&
+                  indexSelected != -1 &&
+                  rideList.length > 0) {
                 List<String> calTime =
                     rideList[indexSelected!].start_time!.split(":");
                 DateTime firstTime = DateTime(
@@ -172,15 +229,40 @@ class _RentalRidesState extends State<RentalRides> {
     super.dispose();
   }
 
+  Future<bool> onWill() {
+    Navigator.pop(context, true);
+    /* Navigator.popUntil(
+      context,
+      ModalRoute.withName('/'),
+    );*/
+    /*Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => SearchLocationPage()),
+        (route) => false);*/
+
+    return Future.value();
+  }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    return Scaffold(
-      backgroundColor: Colors.white,
-      key: scaffoldKey,
-      appBar: AppBar(),
-      body: FadedSlideAnimation(
-        SingleChildScrollView(
+    return WillPopScope(
+      onWillPop: onWill,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        key: scaffoldKey,
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context, true);
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        body: SingleChildScrollView(
           child: Column(
             children: [
               Container(
@@ -376,10 +458,10 @@ class _RentalRidesState extends State<RentalRides> {
                               ? GestureDetector(
                                   onTap: () async {
                                     /*   var result =await Navigator.push(context, MaterialPageRoute(builder: (
-                        context) => RideInfoPage(rideList[index])));
-                    if(result!=null){
-                      selected ? getRides("3") : getRides("1");
-                    }*/
+                          context) => RideInfoPage(rideList[index])));
+                      if(result!=null){
+                        selected ? getRides("3") : getRides("1");
+                      }*/
                                   },
                                   child: Container(
                                     decoration: boxDecoration(
@@ -419,7 +501,7 @@ class _RentalRidesState extends State<RentalRides> {
                                                                   .bodyText1,
                                                             ),
                                                             Text(
-                                                              'Km- \u{20B9}${rideList[index].extra_km_charge.toString()}/Km.',
+                                                              'Km- $km/Km.',
                                                               style: theme
                                                                   .textTheme
                                                                   .bodyText1,
@@ -438,7 +520,7 @@ class _RentalRidesState extends State<RentalRides> {
                                                             .spaceBetween,
                                                     children: [
                                                       Text(
-                                                        'Extra Time- ${rideList[index].extra_time_charge.toString()}/min.',
+                                                        'Extra Time- \u{20B9}${rideList[index].extra_time_charge.toString()}/min.',
                                                         style: theme.textTheme
                                                             .bodyText1,
                                                       ),
@@ -564,7 +646,7 @@ class _RentalRidesState extends State<RentalRides> {
                                                                   rideList[index]
                                                                               .acceptReject ==
                                                                           "6"
-                                                                      ? "Complete OTP : ${rideList[index].bookingOtp.toString()}"
+                                                                      ? "Trip End OTP : ${rideList[index].bookingOtp.toString()}"
                                                                       : "Start OTP : ${rideList[index].bookingOtp.toString()}",
                                                                   style: TextStyle(
                                                                       fontWeight:
@@ -627,7 +709,7 @@ class _RentalRidesState extends State<RentalRides> {
                                                                 .toString()
                                                                 .contains(
                                                                     "Rental Booking")
-                                                            ? "Rental Booking - ${rideList[index].start_time} - ${rideList[index].end_time}"
+                                                            ? "Rental Booking\n${rideList[index].start_time} - ${rideList[index].end_time}"
                                                             : "${getTranslated(context, "SCHEDULE")} - ${rideList[index].pickupDate} ${rideList[index].pickupTime}",
                                                         textStyle:
                                                             colorizeTextStyle,
@@ -650,7 +732,7 @@ class _RentalRidesState extends State<RentalRides> {
                                                                 .toString()
                                                                 .contains(
                                                                     "Rental Booking")
-                                                            ? "Allow Time/KM ${rideList[index].hours}M - ${rideList[index].km}KM"
+                                                            ? "Allow Time/KM\n${rideList[index].hours}min. - ${rideList[index].km}KM"
                                                             : "",
                                                         textStyle:
                                                             colorizeTextStyle,
@@ -669,9 +751,9 @@ class _RentalRidesState extends State<RentalRides> {
                                               )
                                             : SizedBox(),
                                         /* !rideList[index].bookingType!.contains("Point")?Text(
-                          'Schedule - ${rideList[index].pickupDate} ${rideList[index].pickupTime}',
-                          style: theme.textTheme.bodyText2,
-                        ):SizedBox(),*/
+                            'Schedule - ${rideList[index].pickupDate} ${rideList[index].pickupTime}',
+                            style: theme.textTheme.bodyText2,
+                          ):SizedBox(),*/
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceEvenly,
@@ -683,8 +765,9 @@ class _RentalRidesState extends State<RentalRides> {
                                                           context: context,
                                                           builder: (context) =>
                                                               RateRideDialog(
-                                                                  rideList[
-                                                                      index]));
+                                                                rideList[index],
+                                                                check: true,
+                                                              ));
                                                       // showBottom(rideList[index].driverId,rideList[index].bookingId);
                                                     },
                                                     child: Container(
@@ -720,13 +803,85 @@ class _RentalRidesState extends State<RentalRides> {
                                                                 )),
                                                     ),
                                                   )
-                                                : InkWell(
+                                                : rideList[index]
+                                                            .acceptReject ==
+                                                        "1"
+                                                    ? InkWell(
+                                                        onTap: () {
+                                                          showBottom1(
+                                                              rideList[index]
+                                                                  .id,
+                                                              rideList[index]
+                                                                  .createdDate,
+                                                              index);
+                                                        },
+                                                        child: Container(
+                                                          width: 30.w,
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 5,
+                                                                  horizontal:
+                                                                      16),
+                                                          height: 5.h,
+                                                          decoration: boxDecoration(
+                                                              radius: 5,
+                                                              bgColor: Theme.of(
+                                                                      context)
+                                                                  .primaryColor),
+                                                          child: Center(
+                                                              child: loading1
+                                                                  ? text(
+                                                                      getTranslated(context,
+                                                                          "CANCEL")!,
+                                                                      fontFamily:
+                                                                          fontMedium,
+                                                                      fontSize:
+                                                                          10.sp,
+                                                                      isCentered:
+                                                                          true,
+                                                                      textColor:
+                                                                          Colors
+                                                                              .white)
+                                                                  : CircularProgressIndicator(
+                                                                      color: Colors
+                                                                          .white,
+                                                                    )),
+                                                        ),
+                                                      )
+                                                    : SizedBox(),
+                                            rideList[index].payment_status !=
+                                                    "1"
+                                                ? InkWell(
                                                     onTap: () {
-                                                      showBottom1(
-                                                          rideList[index].id,
-                                                          rideList[index]
-                                                              .createdDate,
-                                                          index);
+                                                      setState(() {
+                                                        loading1 = false;
+                                                      });
+                                                      final dynamicLinkParams =
+                                                          DynamicLinkParameters(
+                                                        link: Uri.parse(
+                                                            "https://developmentalphawizz.com/taxi/?${rideList[index].bookingId}"),
+                                                        uriPrefix:
+                                                            "https://sahayatri.page.link",
+                                                        androidParameters:
+                                                            const AndroidParameters(
+                                                                packageName:
+                                                                    "com.sahayatri.user"),
+                                                        iosParameters:
+                                                            const IOSParameters(
+                                                                bundleId:
+                                                                    "com.sahayatri.user"),
+                                                      );
+                                                      FirebaseDynamicLinks
+                                                          .instance
+                                                          .buildShortLink(
+                                                              dynamicLinkParams)
+                                                          .then(
+                                                              (ShortDynamicLink
+                                                                  value) {
+                                                        print(value.shortUrl);
+                                                        capturePng(index,
+                                                            value.shortUrl);
+                                                      });
                                                     },
                                                     child: Container(
                                                       width: 30.w,
@@ -745,7 +900,7 @@ class _RentalRidesState extends State<RentalRides> {
                                                               ? text(
                                                                   getTranslated(
                                                                       context,
-                                                                      "CANCEL")!,
+                                                                      "SHARE")!,
                                                                   fontFamily:
                                                                       fontMedium,
                                                                   fontSize:
@@ -760,46 +915,49 @@ class _RentalRidesState extends State<RentalRides> {
                                                                       .white,
                                                                 )),
                                                     ),
-                                                  ),
-                                            InkWell(
-                                              onTap: () {
-                                                final referCodeService =
-                                                    ReferCodeService(context,
-                                                        onResult: (result) {
-                                                  capturePng(index, result);
-                                                });
-                                                referCodeService.init(
-                                                    rideList[index].bookingId);
-                                                setState(() {
-                                                  loading1 = false;
-                                                });
-                                              },
-                                              child: Container(
-                                                width: 30.w,
-                                                margin: EdgeInsets.symmetric(
-                                                    vertical: 5,
-                                                    horizontal: 16),
-                                                height: 5.h,
-                                                decoration: boxDecoration(
-                                                    radius: 5,
-                                                    bgColor: Theme.of(context)
-                                                        .primaryColor),
-                                                child: Center(
-                                                    child: loading1
-                                                        ? text(
-                                                            getTranslated(context,
-                                                                "SHARE")!,
-                                                            fontFamily:
-                                                                fontMedium,
-                                                            fontSize: 10.sp,
-                                                            isCentered: true,
-                                                            textColor:
-                                                                Colors.white)
-                                                        : CircularProgressIndicator(
-                                                            color: Colors.white,
-                                                          )),
-                                              ),
-                                            ),
+                                                  )
+                                                : selected
+                                                    ? InkWell(
+                                                        onTap: () {
+                                                          showDialog(
+                                                              context: context,
+                                                              builder: (context) =>
+                                                                  PaymentDialog(
+                                                                      rideList[
+                                                                          index]));
+                                                        },
+                                                        child: Container(
+                                                          width: 30.w,
+                                                          margin: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 5,
+                                                                  horizontal:
+                                                                      16),
+                                                          height: 5.h,
+                                                          decoration: boxDecoration(
+                                                              radius: 5,
+                                                              bgColor: Theme.of(
+                                                                      context)
+                                                                  .primaryColor),
+                                                          child: Center(
+                                                              child: loading1
+                                                                  ? text("Pay",
+                                                                      fontFamily:
+                                                                          fontMedium,
+                                                                      fontSize:
+                                                                          10.sp,
+                                                                      isCentered:
+                                                                          true,
+                                                                      textColor:
+                                                                          Colors
+                                                                              .white)
+                                                                  : CircularProgressIndicator(
+                                                                      color: Colors
+                                                                          .white,
+                                                                    )),
+                                                        ),
+                                                      )
+                                                    : SizedBox(),
                                           ],
                                         ),
                                         SizedBox(height: 12),
@@ -819,9 +977,6 @@ class _RentalRidesState extends State<RentalRides> {
             ],
           ),
         ),
-        beginOffset: Offset(0, 0.3),
-        endOffset: Offset(0, 0),
-        slideCurve: Curves.linearToEaseOut,
       ),
     );
   }
@@ -834,7 +989,7 @@ class _RentalRidesState extends State<RentalRides> {
   ];
 
   final colorizeTextStyle = TextStyle(
-    fontSize: 10.0,
+    fontSize: 12.0,
     fontFamily: 'Horizon',
   );
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey();
@@ -987,9 +1142,9 @@ class _RentalRidesState extends State<RentalRides> {
           "$dir/" + DateTime.now().millisecondsSinceEpoch.toString() + ".png");
       await file.writeAsBytes(pngBytes);
       setState(() {
-        loading = true;
+        loading1 = true;
       });
-      SocialShare.shareOptions("${referUrl}", imagePath: file.path);
+      SocialShare.shareOptions("${url}", imagePath: file.path);
       return file.path;
     } catch (e) {
       print(e);
@@ -1055,10 +1210,15 @@ class _RentalRidesState extends State<RentalRides> {
         String msg = response['message'];
         setSnackbar(msg, context);
         if (response['status']) {
-          Navigator.pushAndRemoveUntil(
+          Navigator.pop(context, true);
+          /*Navigator.popUntil(
+            context,
+            ModalRoute.withName('/'),
+          );*/
+          /*Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => SearchLocationPage()),
-              (route) => false);
+              (route) => false);*/
         } else {}
       } on TimeoutException catch (_) {
         setSnackbar(getTranslated(context, "WRONG")!, context);
@@ -1072,7 +1232,7 @@ class _RentalRidesState extends State<RentalRides> {
   PersistentBottomSheetController? persistentBottomSheetController1;
   getDifference(index) {
     String date = rideList[index].pickupDate.toString();
-    DateTime temp = DateTime.parse(date);
+    DateTime temp = DateTime.parse(date.replaceAll(" ", ""));
     if (temp.day == DateTime.now().day) {
       String time = rideList[index].pickupTime.toString().split(" ")[0];
       DateTime temp = DateTime(
@@ -1102,23 +1262,34 @@ class _RentalRidesState extends State<RentalRides> {
             Container(
               padding: EdgeInsets.all(getWidth(10)),
               color: Colors.white,
-              child: AnimatedTextKit(
-                animatedTexts: [
-                  ColorizeAnimatedText(
-                    "Cancellation Charge ₹${rideList[index].cancel_charge} is deducted from wallet.",
-                    textStyle: colorizeTextStyle,
-                    colors: colorizeColors,
+              child: Column(
+                children: [
+                  AnimatedTextKit(
+                    animatedTexts: [
+                      ColorizeAnimatedText(
+                        "Cancellation Charge ₹${rideList[index].cancel_charge} will be deducted from the wallet.",
+                        textStyle: colorizeTextStyle,
+                        colors: colorizeColors,
+                      ),
+                    ],
+                    pause: Duration(milliseconds: 100),
+                    isRepeatingAnimation: true,
+                    totalRepeatCount: 100,
+                    onTap: () {
+                      print("Tap Event");
+                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "This charge is deducted from your wallet",
+                    style: TextStyle(color: Colors.red),
                   ),
                 ],
-                pause: Duration(milliseconds: 100),
-                isRepeatingAnimation: true,
-                totalRepeatCount: 100,
-                onTap: () {
-                  print("Tap Event");
-                },
               ),
             ),
-            Text("OTP : ${rideList[index].bookingOtp}"),
+            //  Text("OTP : ${rideList[index].bookingOtp}"),
             boxHeight(20),
             text("${getTranslated(context, "SELECT_REASON")}",
                 textColor: MyColorName.colorTextPrimary,

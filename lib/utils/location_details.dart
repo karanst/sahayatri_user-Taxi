@@ -1,14 +1,15 @@
 import 'package:cabira/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:geocode/geocode.dart';
+
 import 'package:location/location.dart';
 
-class GetLocation{
+class GetLocation {
   LocationData? _currentPosition;
 
   late String _address = "";
   Location location1 = Location();
-  String firstLocation = "",lat = "",lng = "";
+  String firstLocation = "", lat = "", lng = "";
   ValueChanged onResult;
 
   GetLocation(this.onResult);
@@ -36,28 +37,32 @@ class GetLocation{
 
     location1.onLocationChanged.listen((LocationData currentLocation) {
       print("${currentLocation.latitude} : ${currentLocation.longitude}");
-      _currentPosition = currentLocation;print(currentLocation.latitude);
+      _currentPosition = currentLocation;
+      print(currentLocation.latitude);
+      latitudeFirst = _currentPosition!.latitude!;
+      longitudeFirst = _currentPosition!.longitude!;
+      if (latitude == 0) {
+        getAddress(_currentPosition!.latitude, _currentPosition!.longitude)
+            .then((value) {
+          firstLocation = value.first.city.toString();
+          print(firstLocation);
+          print(value.first.streetAddress.toString());
+          print(value.first.city.toString());
 
-      _getAddress(_currentPosition!.latitude,
-          _currentPosition!.longitude)
-          .then((value) {
-        _address = "${value.first.coordinates.longitude}";
-        firstLocation = value.first.subLocality.toString();
-        lat = _currentPosition!.latitude.toString();
-        lng = _currentPosition!.longitude.toString();
-        if(latitude==0){
-          onResult(value);
-        }
-      });
+          if (latitude == 0) {
+            if (!value.first.streetAddress.toString().contains("pricing")) {
+              onResult(value);
+            }
+          }
+        });
+      }
     });
   }
+}
 
-  Future<List<Address>> _getAddress(double? lat, double? lang) async {
-    final coordinates = new Coordinates(lat, lang);
-    List<Address> add =
-    await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    return add;
-  }
-
-
+Future<List<Address>> getAddress(double? lat, double? lng) async {
+  final coordinates = new Coordinates(latitude: lat, longitude: lng);
+  Address add =
+      await GeoCode().reverseGeocoding(latitude: lat!, longitude: lng!);
+  return [add];
 }

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:cabira/DrawerPages/Settings/rules.dart';
 import 'package:cabira/DrawerPages/Settings/theme_cubit.dart';
 import 'package:cabira/Locale/locale.dart';
@@ -14,9 +13,9 @@ import 'package:cabira/utils/constant.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:screen/screen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'language_cubit.dart';
 
@@ -40,24 +39,24 @@ class _SettingsPageState extends State<SettingsPage> {
     _languageCubit = BlocProvider.of<LanguageCubit>(context);
     _themeCubit = BlocProvider.of<ThemeCubit>(context);
   }
-  List<String> langCode = ["en", "ne",];
-  List<String?> languageList = [
 
+  List<String> langCode = [
+    "en",
+    "ne",
   ];
+  List<String?> languageList = [];
   int? selectLan;
   getSaved() async {
-
     //String get = await settingsProvider.getPrefrence(APP_THEME) ?? '';
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     String getlng = await prefs.getString(languageCode) ?? '';
-    setState((){
+    setState(() {
       selectLan = langCode.indexOf(getlng == '' ? "en" : getlng);
     });
-
-
   }
+
   ApiBaseHelper apiBase = new ApiBaseHelper();
   bool isNetwork = false;
   updateStatus(String status1) async {
@@ -87,6 +86,7 @@ class _SettingsPageState extends State<SettingsPage> {
       setSnackbar(getTranslated(context, "NO_INTERNET")!, context);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -94,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
     languageList = [
       "English",
       "Nepali",
-     /* Strings.FRENCH,
+      /* Strings.FRENCH,
       Strings.PORTUGUESE,
       Strings.INDONESIAN,
       Strings.SPANISH,*/
@@ -104,57 +104,58 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         backgroundColor: AppTheme.primaryColor,
         title: Text(
-          getTranslated(context,'SETTINGS')!,
+          getTranslated(context, 'SETTINGS')!,
           style: TextStyle(
             color: Colors.black,
           ),
         ),
       ),
-      body: FadedSlideAnimation(
-        Stack(
-          children: [
-            ListView(
-              // crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                boxHeight(20),
-                Card(
-                  margin: EdgeInsets.all(getWidth(10)),
-                  child: ListTile(
-                    title:Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      child: Text(
-                        getTranslated(context, "LOCK_SCREEN")!,
-                        style: theme.textTheme.bodyText2!
-                            .copyWith(color: theme.hintColor),
-                      ),
+      body: Stack(
+        children: [
+          ListView(
+            // crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              boxHeight(20),
+              Card(
+                margin: EdgeInsets.all(getWidth(10)),
+                child: ListTile(
+                  title: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    child: Text(
+                      getTranslated(context, "LOCK_SCREEN")!,
+                      style: theme.textTheme.bodyText2!
+                          .copyWith(color: theme.hintColor),
                     ),
-                    trailing: Switch.adaptive(value: doLock, onChanged: (value)async{
-                      await App.init();
-                      App.localStorage.setBool("lock", value);
-                      Screen.keepOn(value);
-                      setState(() {
-                        doLock = value;
-                      });
-                    }),
                   ),
+                  trailing: Switch.adaptive(
+                      value: doLock,
+                      onChanged: (value) async {
+                        await App.init();
+                        App.localStorage.setBool("lock", value);
+                        Wakelock.toggle(enable: value);
+                        setState(() {
+                          doLock = value;
+                        });
+                      }),
                 ),
-                Card(
-                  margin: EdgeInsets.all(getWidth(10)),
-                  child: ListTile(
-                    title:Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                      child: Text(
-                        getTranslated(context, "RULES")!,
-                        style: theme.textTheme.bodyText2!
-                            .copyWith(color: theme.hintColor),
-                      ),
+              ),
+              Card(
+                margin: EdgeInsets.all(getWidth(10)),
+                child: ListTile(
+                  title: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                    child: Text(
+                      getTranslated(context, "RULES")!,
+                      style: theme.textTheme.bodyText2!
+                          .copyWith(color: theme.hintColor),
                     ),
-                    onTap: (){
-                      navigateScreen(context,RulesRegulation());
-                    },
                   ),
+                  onTap: () {
+                    navigateScreen(context, RulesRegulation());
+                  },
                 ),
-               /* Card(
+              ),
+              /* Card(
                   margin: EdgeInsets.all(getWidth(10)),
                   child: ListTile(
                     title:Padding(
@@ -177,7 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     }),
                   ),
                 ),*/
-               /* ListView.builder(
+              /* ListView.builder(
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: themes.length,
                   shrinkWrap: true,
@@ -193,40 +194,40 @@ class _SettingsPageState extends State<SettingsPage> {
                     title: Text(getString(themes[index])!),
                   ),
                 ),*/
-                Card(
-                  margin: EdgeInsets.all(getWidth(10)),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                    child: Text(
-                      getTranslated(context,'CHOOSE_LANG')!,
-                      style: theme.textTheme.bodyText2!
-                          .copyWith(color: theme.hintColor),
-                    ),
+              Card(
+                margin: EdgeInsets.all(getWidth(10)),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: Text(
+                    getTranslated(context, 'CHOOSE_LANG')!,
+                    style: theme.textTheme.bodyText2!
+                        .copyWith(color: theme.hintColor),
                   ),
                 ),
-                ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: languageList.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) => RadioListTile(
-                    activeColor: theme.primaryColor,
-                    value: index,
-                    groupValue: selectLan,
-                    onChanged: (dynamic value) {
-                      setState(() {
-                        selectLan = index;
-                        _changeLan(langCode[index], context);
-                      });
-                    },
-                    title: Text(languageList[index]!),
-                  ),
+              ),
+              ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: languageList.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) => RadioListTile(
+                  activeColor: theme.primaryColor,
+                  value: index,
+                  groupValue: selectLan,
+                  onChanged: (dynamic value) {
+                    setState(() {
+                      selectLan = index;
+                      _changeLan(langCode[index], context);
+                    });
+                  },
+                  title: Text(languageList[index]!),
                 ),
-                SizedBox(
-                  height: 80,
-                )
-              ],
-            ),
-            /*PositionedDirectional(
+              ),
+              SizedBox(
+                height: 80,
+              )
+            ],
+          ),
+          /*PositionedDirectional(
               bottom: 0,
               start: 0,
               end: 0,
@@ -265,14 +266,11 @@ class _SettingsPageState extends State<SettingsPage> {
                 },
               ),
             ),*/
-          ],
-        ),
-        beginOffset: Offset(0, 0.3),
-        endOffset: Offset(0, 0),
-        slideCurve: Curves.linearToEaseOut,
+        ],
       ),
     );
   }
+
   void _changeLan(String language, BuildContext ctx) async {
     Locale _locale = await setLocale(language);
 

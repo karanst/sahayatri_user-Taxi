@@ -27,7 +27,6 @@ const spacing_large = 24.0;
 const spacing_xlarge = 32.0;
 const spacing_xxLarge = 40.0;
 
-
 final int timeOut = 60;
 const int perPage = 10;
 
@@ -46,7 +45,8 @@ final String baseUrl1 =
     //"https://192.168.0.50/TAXI_APP/";
     'https://developmentalphawizz.com/taxi/api/';
 
-final String playUrl = "https://play.google.com/store/apps/details?id=$packageName";
+final String playUrl =
+    "https://play.google.com/store/apps/details?id=$packageName";
 String? curUserId;
 String? curTikId = '';
 String? fcmToken;
@@ -55,37 +55,60 @@ String? privacy = '';
 String? returned = "";
 String? delivery = "";
 String? company = "";
-String address="";
-double latitude=0;
+String address = "";
+double latitude = 0;
 double longitude = 0;
-String proImage="";
+double latitudeFirst = 0;
+double longitudeFirst = 0;
+String proImage = "";
 int likeCount = 0;
 bool notification = true;
 bool doLock = false;
-String name="",email="",gender1="",dob ="",password = "",mobile="",image = "",drivingImage = "",brand = "",model = "", number = "",refer ="",referUrl = "",tempRefer="", isFirstUser = "";
-String razorPayKey="rzp_test_UUBtmcArqOLqIY";
+String name = "",
+    email = "",
+    gender1 = "",
+    dob = "",
+    password = "",
+    mobile = "",
+    image = "",
+    drivingImage = "",
+    brand = "",
+    model = "",
+    number = "",
+    refer = "",
+    referUrl = "",
+    tempRefer = "",
+    isFirstUser = "";
+String razorPayKey = "rzp_test_UUBtmcArqOLqIY";
 String userNumber = "";
 String cancelTime = "";
 double walletAmount = 0;
-String razorPaySecret="NTW3MUbXOtcwUrz5a4YCshqk";
-double getHeight(double height){
+String razorPaySecret = "NTW3MUbXOtcwUrz5a4YCshqk";
+double getHeight(double height) {
   double tempHeight = 0.0;
-  tempHeight = ((height * 100)/812).h;
+  tempHeight = ((height * 100) / 812).h;
   return tempHeight;
 }
-double getWidth(double width){
+
+double getWidth(double width) {
   double tempWidth = 0.0;
-  tempWidth = ((width * 100)/375).w;
+  tempWidth = ((width * 100) / 375).w;
   return tempWidth;
 }
-Widget boxWidth(double width){
-  return SizedBox(width: getWidth(width),);
+
+Widget boxWidth(double width) {
+  return SizedBox(
+    width: getWidth(width),
+  );
 }
 
-Widget boxHeight(double height){
-  return SizedBox(height: getHeight(height),);
+Widget boxHeight(double height) {
+  return SizedBox(
+    height: getHeight(height),
+  );
 }
-navigateScreen(BuildContext context,Widget widget){
+
+navigateScreen(BuildContext context, Widget widget) {
   Navigator.push(
       context,
       PageTransition(
@@ -94,7 +117,8 @@ navigateScreen(BuildContext context,Widget widget){
         duration: Duration(milliseconds: 500),
       ));
 }
-navigateBackScreen(BuildContext context,Widget widget){
+
+navigateBackScreen(BuildContext context, Widget widget) {
   Navigator.pushReplacement(
       context,
       PageTransition(
@@ -103,6 +127,7 @@ navigateBackScreen(BuildContext context,Widget widget){
         duration: Duration(milliseconds: 500),
       ));
 }
-back(BuildContext context){
+
+back(BuildContext context) {
   Navigator.pop(context);
 }

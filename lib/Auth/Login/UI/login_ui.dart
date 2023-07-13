@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:cabira/Auth/Login/UI/login_page.dart';
 import 'package:cabira/Auth/Registration/UI/registration_page.dart';
 import 'package:cabira/Auth/Registration/UI/registration_ui.dart';
@@ -53,22 +52,21 @@ class _LoginUIState extends State<LoginUI> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     return Scaffold(
-      body: FadedSlideAnimation(
-        SingleChildScrollView(
-          child: Container(
+      body: SingleChildScrollView(
+        child: Container(
             color: Color(0xff41dbde),
             height: MediaQuery.of(context).size.height,
             child:
-            // choose == "pass"
-            //     ?
-            Column(
+                // choose == "pass"
+                //     ?
+                Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Spacer(flex: 2),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                      getTranslated(context,'ENTER_YOUR')! +
+                      getTranslated(context, 'ENTER_YOUR')! +
                           '\n' +
                           "Mobile Number and Password",
                       style: theme.textTheme.headline4!.copyWith(fontSize: 20)),
@@ -91,19 +89,22 @@ class _LoginUIState extends State<LoginUI> {
                         maxLength: 10,
                         keyboardType: TextInputType.phone,
                         controller: _numberController,
-                        label: getTranslated(context,'ENTER_PHONE'),
+                        label: getTranslated(context, 'ENTER_PHONE'),
                       ),
                       EntryField(
                         //  initialValue: name.toString(),
                         controller: passCon,
                         keyboardType: TextInputType.visiblePassword,
-                        label:getTranslated(context, "PASSWORD")!,
+                        label: getTranslated(context, "PASSWORD")!,
                         obscureText: obscure,
                         suffixIcon: IconButton(
-                          icon: Icon(obscure?Icons.visibility:Icons.visibility_off,color: MyColorName.primaryLite,),
-                          onPressed: (){
+                          icon: Icon(
+                            obscure ? Icons.visibility : Icons.visibility_off,
+                            color: MyColorName.primaryLite,
+                          ),
+                          onPressed: () {
                             setState(() {
-                                obscure=!obscure;
+                              obscure = !obscure;
                             });
                           },
                         ),
@@ -112,11 +113,12 @@ class _LoginUIState extends State<LoginUI> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           InkWell(
-                            onTap: (){
+                            onTap: () {
                               navigateScreen(context, ForgetScreen());
                             },
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal:15.0,vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 15.0, vertical: 5),
                               child: text(getTranslated(context, "FORGOT")!,
                                   fontFamily: fontMedium,
                                   fontSize: 12.sp,
@@ -126,68 +128,76 @@ class _LoginUIState extends State<LoginUI> {
                         ],
                       ),
                       Spacer(flex: 1),
-                     Padding(
-                       padding: const EdgeInsets.only(left: 12.0, right: 12),
-                       child: Row(
-                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                         children: [
-                           InkWell(
-                           onTap: () async {
-
-                             // if(validateEmail(emailCon.text, getTranslated(context, "VALID_EMAIL")!,getTranslated(context, "VALID_EMAIL")!)!=null){
-                             //   setSnackbar(validateEmail(emailCon.text, getTranslated(context, "VALID_EMAIL")!,getTranslated(context, "VALID_EMAIL")!).toString(), context);
-                             //   return;
-                             // }
-                             if (_numberController.text == "" || _numberController.text.length != 10) {
-                               setSnackbar("Please Enter Valid Mobile Number", context);
-                               return;}
-                             if(passCon.text==""||passCon.text.length<8){
-                               setSnackbar(getTranslated(context, "ENTER_PASSWORD")!, context);
-                               return ;
-                             }
-                             setState(() {
-                               loading = true;
-                             });
-                             loginUser();
-                           },
-                           child: Container(
-                             width: 50.w - 30,
-                             height: 6.h,
-                             decoration: boxDecoration(
-                                 radius: 10,
-                                 bgColor: Theme.of(context).primaryColor),
-                             child: Center(
-                                 child: !loading
-                                     ?text("LOGIN",
-                                     // getTranslated(context, "CONTINUE")!,
-                                     fontFamily: fontMedium,
-                                     fontSize: 12.sp,
-                                     textColor: Colors.white):CircularProgressIndicator()),
-                           ),
-                         ),
-                           InkWell(
-                             onTap: () async {
-                               navigateScreen(
-                                   context, RegistrationUI("","",""));
-                             },
-                             child: Container(
-                               width: 50.w - 30,
-                               height: 6.h,
-                               decoration: boxDecoration(
-                                   radius: 10,
-                                   bgColor: Theme.of(context).primaryColor),
-                               child: Center(
-                                   child: !loading
-                                       ?text("REGISTER",
-                                       // getTranslated(context, "CONTINUE")!,
-                                       fontFamily: fontMedium,
-                                       fontSize: 12.sp,
-                                       textColor: Colors.white):CircularProgressIndicator()),
-                             ),
-                           ),
-                         ],
-                       ),
-                     ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12.0, right: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () async {
+                                // if(validateEmail(emailCon.text, getTranslated(context, "VALID_EMAIL")!,getTranslated(context, "VALID_EMAIL")!)!=null){
+                                //   setSnackbar(validateEmail(emailCon.text, getTranslated(context, "VALID_EMAIL")!,getTranslated(context, "VALID_EMAIL")!).toString(), context);
+                                //   return;
+                                // }
+                                if (_numberController.text == "" ||
+                                    _numberController.text.length != 10) {
+                                  setSnackbar(
+                                      "Please Enter Valid Mobile Number",
+                                      context);
+                                  return;
+                                }
+                                if (passCon.text == "" ||
+                                    passCon.text.length < 8) {
+                                  setSnackbar(
+                                      getTranslated(context, "ENTER_PASSWORD")!,
+                                      context);
+                                  return;
+                                }
+                                setState(() {
+                                  loading = true;
+                                });
+                                loginUser();
+                              },
+                              child: Container(
+                                width: 50.w - 30,
+                                height: 6.h,
+                                decoration: boxDecoration(
+                                    radius: 10,
+                                    bgColor: Theme.of(context).primaryColor),
+                                child: Center(
+                                    child: !loading
+                                        ? text("LOGIN",
+                                            // getTranslated(context, "CONTINUE")!,
+                                            fontFamily: fontMedium,
+                                            fontSize: 12.sp,
+                                            textColor: Colors.white)
+                                        : CircularProgressIndicator()),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                navigateScreen(
+                                    context, RegistrationUI("", "", ""));
+                              },
+                              child: Container(
+                                width: 50.w - 30,
+                                height: 6.h,
+                                decoration: boxDecoration(
+                                    radius: 10,
+                                    bgColor: Theme.of(context).primaryColor),
+                                child: Center(
+                                    child: !loading
+                                        ? text("REGISTER",
+                                            // getTranslated(context, "CONTINUE")!,
+                                            fontFamily: fontMedium,
+                                            fontSize: 12.sp,
+                                            textColor: Colors.white)
+                                        : CircularProgressIndicator()),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       Spacer(flex: 1),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -262,7 +272,7 @@ class _LoginUIState extends State<LoginUI> {
                       //   ),
                       // ),
                       Spacer(flex: 1),
-                /*      !loading
+                      /*      !loading
                           ? CustomButton(
                               onTap: () {
                                 if (_numberController.text == "" ||
@@ -420,11 +430,7 @@ class _LoginUIState extends State<LoginUI> {
             //     ),
             //   ],
             // ),
-          ),
-        ),
-        beginOffset: Offset(0, 0.3),
-        endOffset: Offset(0, 0),
-        slideCurve: Curves.linearToEaseOut,
+            ),
       ),
     );
   }
@@ -489,12 +495,12 @@ class _LoginUIState extends State<LoginUI> {
         });
         setSnackbar(msg, context);
         if (response['status']) {
-          App.localStorage.setString("userId", response['data']['id'].toString());
+          App.localStorage
+              .setString("userId", response['data']['id'].toString());
           curUserId = response['data']['id'].toString();
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SearchLocationPage()), (route) => false);
-        } else {
-
-        }
+          Navigator.popAndPushNamed(context, "/");
+          // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SearchLocationPage()), (route) => false);
+        } else {}
       } on TimeoutException catch (_) {
         setSnackbar(getTranslated(context, "WRONG")!, context);
         setState(() {
@@ -530,18 +536,17 @@ class _LoginUIState extends State<LoginUI> {
         });
         setSnackbar(msg, context);
         if (response['status']) {
-          App.localStorage.setString("userId", response['data']['id'].toString());
+          App.localStorage
+              .setString("userId", response['data']['id'].toString());
           curUserId = response['data']['id'].toString();
           print("OTP ==== ${response['data']['otp'].toString()}");
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => VerificationPage(
-                  _numberController.text.trim().toString(),
-                  response['data']['otp'].toString()
-              )));
-        } else {
-
-        }
+              MaterialPageRoute(
+                  builder: (context) => VerificationPage(
+                      _numberController.text.trim().toString(),
+                      response['data']['otp'].toString())));
+        } else {}
       } on TimeoutException catch (_) {
         setSnackbar(getTranslated(context, "WRONG")!, context);
         setState(() {
@@ -627,12 +632,13 @@ class _LoginUIState extends State<LoginUI> {
 
       if (error) {
         setSnackbar("Google Login Successfully", context);
-        App.localStorage.setString("userId", response['data'][0]['id'].toString());
+        App.localStorage
+            .setString("userId", response['data'][0]['id'].toString());
         curUserId = response['data'][0]['id'].toString();
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SearchLocationPage()), (route) => false);
+        Navigator.popAndPushNamed(context, "/");
+        //  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SearchLocationPage()), (route) => false);
       } else {
-        navigateScreen(
-            context, RegistrationUI("",myName,myEmail));
+        navigateScreen(context, RegistrationUI("", myName, myEmail));
       }
     } else {
       setSnackbar("No Internet", context);

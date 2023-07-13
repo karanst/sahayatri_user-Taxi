@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:cabira/DrawerPages/Settings/theme_cubit.dart';
 import 'package:cabira/Theme/style.dart';
 import 'package:cabira/utils/ApiBaseHelper.dart';
@@ -20,12 +19,11 @@ import 'package:sizer/sizer.dart';
 import 'language_cubit.dart';
 import 'package:http/http.dart' as http;
 
-class RuleModel{
-  String id,title,description;
+class RuleModel {
+  String id, title, description;
 
   RuleModel(this.id, this.title, this.description);
 }
-
 
 class RulesRegulation extends StatefulWidget {
   @override
@@ -43,6 +41,7 @@ class _RulesRegulationState extends State<RulesRegulation> {
     super.initState();
     getRules();
   }
+
   ApiBaseHelper apiBase = new ApiBaseHelper();
   bool isNetwork = false;
   List<RuleModel> ruleList = [];
@@ -55,7 +54,8 @@ class _RulesRegulationState extends State<RulesRegulation> {
         data = {
           "user_id": curUserId,
         };
-        var res = await http.get(Uri.parse(baseUrl1 + "page/get_user_pages/rules-and-regulations"));
+        var res = await http.get(
+            Uri.parse(baseUrl1 + "page/get_user_pages/rules-and-regulations"));
         Map response = jsonDecode(res.body);
         print(response);
         print(response);
@@ -63,9 +63,10 @@ class _RulesRegulationState extends State<RulesRegulation> {
         String msg = response['message'];
         setSnackbar(msg, context);
         if (response['status']) {
-          for(var v in response['data']){
+          for (var v in response['data']) {
             setState(() {
-              ruleList.add(new RuleModel(v['id'], v['title'], v['page_content']));
+              ruleList
+                  .add(new RuleModel(v['id'], v['title'], v['page_content']));
             });
           }
         } else {}
@@ -76,8 +77,6 @@ class _RulesRegulationState extends State<RulesRegulation> {
       setSnackbar(getTranslated(context, "NO_INTERNET")!, context);
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -93,40 +92,42 @@ class _RulesRegulationState extends State<RulesRegulation> {
           ),
         ),
       ),
-      body: FadedSlideAnimation(
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: getWidth(25)),
-          child: Column(
-             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-
-              boxHeight(20),
-              ruleList.length>0?ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: ruleList.length,
-                  itemBuilder: (context,index){
-                    return Container(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          boxHeight(10),
-                          text(getString1(ruleList[index].title),fontSize: 14.sp,fontFamily: fontBold,textColor: MyColorName.colorTextPrimary),
-                          boxHeight(10),
-                          text(getString1(ruleList[index].description),fontSize: 10.sp,fontFamily: fontMedium,isLongText: true,textColor: MyColorName.colorTextPrimary),
-
-                        ],
-                      ),
-                    );
-                  }):CircularProgressIndicator(),
-              SizedBox(
-                height: 80,
-              )
-            ],
-          ),
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: getWidth(25)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            boxHeight(20),
+            ruleList.length > 0
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: ruleList.length,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            boxHeight(10),
+                            text(getString1(ruleList[index].title),
+                                fontSize: 14.sp,
+                                fontFamily: fontBold,
+                                textColor: MyColorName.colorTextPrimary),
+                            boxHeight(10),
+                            text(getString1(ruleList[index].description),
+                                fontSize: 10.sp,
+                                fontFamily: fontMedium,
+                                isLongText: true,
+                                textColor: MyColorName.colorTextPrimary),
+                          ],
+                        ),
+                      );
+                    })
+                : CircularProgressIndicator(),
+            SizedBox(
+              height: 80,
+            )
+          ],
         ),
-        beginOffset: Offset(0, 0.3),
-        endOffset: Offset(0, 0),
-        slideCurve: Curves.linearToEaseOut,
       ),
     );
   }

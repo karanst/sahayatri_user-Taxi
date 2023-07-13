@@ -44,14 +44,16 @@ class _ReferEarnState extends State<ReferEarn> {
         for (var v in response['data']) {
           setState(() {
             referList.add(new ReferModel(v['id'], v['username'], v['email'], v['mobile'], v['car_type'], v['user_image'], v['refer_status']));
-            des= response['Refferal Message'];
+            des = response['Refferal Message'];
           });
+          print("this is description $des");
         }
       } else {
         setSnackbar(response['message'], context);
         setState((){
-          des= response['Refferal Message'];
+          des = response['Refferal Message'];
         });
+        print("this is description $des");
       }
     } on TimeoutException catch (_) {
       setSnackbar(getTranslated(context, "WRONG")!, context);

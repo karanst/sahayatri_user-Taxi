@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:animation_wrappers/animation_wrappers.dart';
 import 'package:cabira/Auth/Login/UI/login_page.dart';
 import 'package:cabira/Auth/Registration/UI/registration_page.dart';
 import 'package:cabira/Auth/Registration/UI/registration_ui.dart';
@@ -23,10 +22,7 @@ import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sizer/sizer.dart';
 
-
 class ForgetScreen extends StatefulWidget {
-
-
   @override
   _ForgetScreenState createState() => _ForgetScreenState();
 }
@@ -47,80 +43,90 @@ class _ForgetScreenState extends State<ForgetScreen> {
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
     return Scaffold(
-      body: FadedSlideAnimation(
-        SingleChildScrollView(
-          child: Container(
-            color: Color(0xff41dbde),
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Spacer(flex: 2),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                      getTranslated(context,'ENTER_YOUR')! +
-                          '\n' +
-                          getTranslated(context, "EMAIL")!,
-                      style: theme.textTheme.headline4!.copyWith(fontSize: 20)),
+      body: SingleChildScrollView(
+        child: Container(
+          color: Color(0xff41dbde),
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Spacer(flex: 2),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                    getTranslated(context, 'ENTER_YOUR')! +
+                        '\n' +
+                        getTranslated(context, "EMAIL")!,
+                    style: theme.textTheme.headline4!.copyWith(fontSize: 20)),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Text(
+                  "we'll send reset password link",
+                  style: theme.textTheme.bodyText2!
+                      .copyWith(color: theme.hintColor, fontSize: 12),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: Text(
-                    "we'll send reset password link",
-                    style: theme.textTheme.bodyText2!
-                        .copyWith(color: theme.hintColor, fontSize: 12),
-                  ),
-                ),
-                Spacer(),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  color: theme.backgroundColor,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Spacer(),
-                      EntryField(
-                        controller: emailCon,
-                        keyboardType: TextInputType.emailAddress,
-                        label:getTranslated(context,'EMAIL_ADD'),
-                      ),
-                      Spacer(flex: 1),
-                      InkWell(
-                        onTap: () async {
-                          /*if (_numberController.text == "" ||
+              ),
+              Spacer(),
+              Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                color: theme.backgroundColor,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Spacer(),
+                    EntryField(
+                      controller: emailCon,
+                      keyboardType: TextInputType.emailAddress,
+                      label: getTranslated(context, 'EMAIL_ADD'),
+                    ),
+                    Spacer(flex: 1),
+                    InkWell(
+                      onTap: () async {
+                        /*if (_numberController.text == "" ||
                               _numberController.text.length != 10) {
                             setSnackbar(
                                 "Please Enter Valid Mobile Number",
                                 context);
                             return;
                           }*/
-                          if(validateEmail(emailCon.text, getTranslated(context, "VALID_EMAIL")!,getTranslated(context, "VALID_EMAIL")!)!=null){
-                            setSnackbar(validateEmail(emailCon.text, getTranslated(context, "VALID_EMAIL")!,getTranslated(context, "VALID_EMAIL")!).toString(), context);
-                            return;
-                          }
-                          setState(() {
-                            loading = true;
-                          });
-                          loginUser();
-                        },
-                        child: Container(
-                          width: 75.w,
-                          height: 6.h,
-                          decoration: boxDecoration(
-                              radius: 10,
-                              bgColor: Theme.of(context).primaryColor),
-                          child: Center(
-                              child: !loading
-                                  ?text(getTranslated(context, "SEND")!,
-                                  fontFamily: fontMedium,
-                                  fontSize: 12.sp,
-                                  textColor: Colors.white):CircularProgressIndicator()),
-                        ),
+                        if (validateEmail(
+                                emailCon.text,
+                                getTranslated(context, "VALID_EMAIL")!,
+                                getTranslated(context, "VALID_EMAIL")!) !=
+                            null) {
+                          setSnackbar(
+                              validateEmail(
+                                      emailCon.text,
+                                      getTranslated(context, "VALID_EMAIL")!,
+                                      getTranslated(context, "VALID_EMAIL")!)
+                                  .toString(),
+                              context);
+                          return;
+                        }
+                        setState(() {
+                          loading = true;
+                        });
+                        loginUser();
+                      },
+                      child: Container(
+                        width: 75.w,
+                        height: 6.h,
+                        decoration: boxDecoration(
+                            radius: 10,
+                            bgColor: Theme.of(context).primaryColor),
+                        child: Center(
+                            child: !loading
+                                ? text(getTranslated(context, "SEND")!,
+                                    fontFamily: fontMedium,
+                                    fontSize: 12.sp,
+                                    textColor: Colors.white)
+                                : CircularProgressIndicator()),
                       ),
-                      Spacer(flex: 1),
-                      Spacer(flex: 1),
-                      /*      !loading
+                    ),
+                    Spacer(flex: 1),
+                    Spacer(flex: 1),
+                    /*      !loading
                           ? CustomButton(
                               onTap: () {
                                 if (_numberController.text == "" ||
@@ -140,16 +146,12 @@ class _ForgetScreenState extends State<ForgetScreen> {
                               width: 50,
                               child:
                                   Center(child: CircularProgressIndicator())),*/
-                    ],
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-        beginOffset: Offset(0, 0.3),
-        endOffset: Offset(0, 0),
-        slideCurve: Curves.linearToEaseOut,
       ),
     );
   }
@@ -169,8 +171,8 @@ class _ForgetScreenState extends State<ForgetScreen> {
           "pass": passCon.text.trim().toString(),
           "fcm_id": fcmToken.toString(),
         };
-        Map response =
-        await apiBase.postAPICall(Uri.parse(baseUrl + "forgotPassword"), data);
+        Map response = await apiBase.postAPICall(
+            Uri.parse(baseUrl + "forgotPassword"), data);
         print(response);
         bool status = true;
         String msg = response['message'];
@@ -179,10 +181,7 @@ class _ForgetScreenState extends State<ForgetScreen> {
         });
         setSnackbar(msg, context);
         if (response['status']) {
-
-        } else {
-
-        }
+        } else {}
       } on TimeoutException catch (_) {
         setSnackbar(getTranslated(context, "WRONG")!, context);
         setState(() {
@@ -268,12 +267,13 @@ class _ForgetScreenState extends State<ForgetScreen> {
 
       if (error) {
         setSnackbar("Google Login Successfully", context);
-        App.localStorage.setString("userId", response['data'][0]['id'].toString());
+        App.localStorage
+            .setString("userId", response['data'][0]['id'].toString());
         curUserId = response['data'][0]['id'].toString();
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SearchLocationPage()), (route) => false);
+        Navigator.popAndPushNamed(context, "/");
+        // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> SearchLocationPage()), (route) => false);
       } else {
-        navigateScreen(
-            context, RegistrationUI("",myName,myEmail));
+        navigateScreen(context, RegistrationUI("", myName, myEmail));
       }
     } else {
       setSnackbar("No Internet", context);
@@ -309,6 +309,7 @@ class _ForgetScreenState extends State<ForgetScreen> {
         throw UnimplementedError();
     }
   }
+
 /*   Future signInFB() async {
     final FacebookLoginResult result = await fbLogin.logIn(["email","public_profile"]);
     print(result.errorMessage);
@@ -325,7 +326,7 @@ class _ForgetScreenState extends State<ForgetScreen> {
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication? googleAuth =
-    await googleUser?.authentication;
+        await googleUser?.authentication;
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth?.accessToken,
