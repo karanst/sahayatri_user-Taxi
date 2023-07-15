@@ -1847,8 +1847,8 @@ class _SearchLocationPageState extends State<SearchLocationPage> {
                                           });
                                         }
                                         Navigator.of(context).pop();
-                                        getBookInfo();
-                                        getRides("3");
+                                        //  getBookInfo();
+                                        // getRides("3");
                                       },
                                       initialPosition: dropLatitude != 0
                                           ? LatLng(dropLatitude, dropLongitude)

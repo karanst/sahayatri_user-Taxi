@@ -21,7 +21,7 @@ class RowItem extends StatelessWidget {
               ? getTranslated(context, title)!
               : title,
           style: theme.textTheme.headline6!
-              .copyWith(color: theme.hintColor, fontSize: 16),
+              .copyWith(color: theme.hintColor, fontSize: 12),
         ),
         SizedBox(height: 8),
         Row(
@@ -29,12 +29,12 @@ class RowItem extends StatelessWidget {
             Icon(
               icon,
               color: theme.primaryColor,
-              size: 20,
+              size: 16,
             ),
             SizedBox(width: 12),
             Text(
               subtitle!,
-              style: theme.textTheme.headline6!.copyWith(fontSize: 16),
+              style: theme.textTheme.headline6!.copyWith(fontSize: 12),
             ),
           ],
         )

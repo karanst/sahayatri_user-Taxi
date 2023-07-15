@@ -639,26 +639,20 @@ class _RentalRidesState extends State<RentalRides> {
                                                                       .textTheme
                                                                       .caption,
                                                                 ),
-                                                          rideList[index]
-                                                                      .bookingType ==
-                                                                  "Rental Booking"
-                                                              ? Text(
-                                                                  rideList[index]
-                                                                              .acceptReject ==
-                                                                          "6"
-                                                                      ? "Trip End OTP : ${rideList[index].bookingOtp.toString()}"
-                                                                      : "Start OTP : ${rideList[index].bookingOtp.toString()}",
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
-                                                                      color: Colors
-                                                                          .blue,
-                                                                      fontSize:
-                                                                          12),
-                                                                )
-                                                              : SizedBox
-                                                                  .shrink(),
+                                                          Text(
+                                                            rideList[index]
+                                                                        .acceptReject ==
+                                                                    "6"
+                                                                ? "Trip End OTP : ${rideList[index].bookingOtp.toString()}"
+                                                                : "Start OTP : ${rideList[index].bookingOtp.toString()}",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                color:
+                                                                    Colors.blue,
+                                                                fontSize: 12),
+                                                          ),
                                                           Text(
                                                             "${rideList[index].bookingType}",
                                                             textAlign:
